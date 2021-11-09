@@ -15,11 +15,11 @@
 <body>
     <div class="container">
         <aside class="menu">
-            <header><h1>XER Analyzer</h1></header>
+            <header class="f14"><h1>XER Analyzer</h1></header>
             <ul>
-                <li class="btn">Project</li>
-                <li class="btn">Changes</li>
-                <li class="btn">Updates</li>
+                <li class="btn pad-1em border-rad-5 margin-v-20">Project</li>
+                <li class="btn pad-1em border-rad-5 margin-v-20">Changes</li>
+                <li class="btn pad-1em border-rad-5 margin-v-20">Updates</li>
             </ul>
         </aside>
 
@@ -30,23 +30,24 @@
                     <h3 class="pad-bm-05em">File Upload</h3>
                     <div class="upload-wrap grid pad-bm-1em">
                         <label for="current-file-selector">Current XER: </label>
-                        <input type="file" name="current" id="current-file-selector" accept=".xer">
+                        <input type="file" name="current" id="current-file-selector" accept=".xer" required>
                         <select name="current" id="current-project-selector">
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
                     <div class="upload-wrap grid">
                         <label for="previous-file-selector">Previous XER: </label>
-                        <input type="file" name="previous" id="previous-file-selector" accept=".xer">
+                        <input type="file" name="previous" id="previous-file-selector" accept=".xer" required>
                         <select name="previous" id="previous-project-selector">
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
+                    <button id="compare" class="margin-v-20">Compare</button>
                 </div>
                 <div class="card pad-1em border-rad-5 box-shadow margin-10 margin-v-20">
                     <div class="pad-bm-1em">
                         <h3 class="pad-bm-05em">Current Project</h3>
-                        <table>
+                        <table class="f14">
                             <tr>
                                 <td>Project ID:</td>
                                 <td id="current-project-id"></td>
@@ -57,13 +58,13 @@
                             </tr>
                             <tr>
                                 <td>Data Date:</td>
-                                <td id="current-data-date"></td>
+                                <td id="current-dd"></td>
                             </tr>     
                         </table>
                     </div>
                     <div>
                         <h3 class="pad-bm-05em">Previous Project</h3>
-                        <table>
+                        <table class="f14">
                             <tr>
                                 <td>Project ID:</td>
                                 <td id="previous-project-id"></td>
@@ -74,23 +75,51 @@
                             </tr>
                             <tr>
                                 <td>Data Date:</td>
-                                <td id="previous-data-date"></td>
+                                <td id="previous-dd"></td>
                             </tr>     
                         </table>
                     </div>
                 </div>
+                <div class="card pad-1em border-rad-5 box-shadow margin-10 margin-v-20"">
+                    <h3 class="pad-bm-05em">Schedule Dates</h3>
+                    <table class="f14">
+                        <tr>
+                            <th>Date</th>
+                            <th>Current</th>
+                            <th>Previous</th>
+                            <th>Var</th>
+                        </tr>
+                        <tr>
+                            <td>Start Date:</td>
+                            <td id="current-start-date"></td>
+                            <td id="previous-start-date"></td>
+                        </tr>
+                        <tr>
+                            <td>Data Date:</td>
+                            <td id="current-data-date"></td>
+                            <td id="previous-data-date"></td>
+                        </tr>
+                        <tr>
+                            <td>End Date:</td>
+                        </tr>
+                        <tr>
+                            <td>Must Finish By:</td>
+                        </tr>
+                    </table>
+                </div>
             </section>
 
-            <section id="changes">
+            <section id="changes hidden">
                 <h2 class="txt-center">Changes</h2>
             </section>
 
-            <section id="updates">
+            <section id="updates hidden">
                 <h2 class="txt-center">Updates</h2>
             </section>
         </div>
     </div>
 
     <script src="./static/js/app.js"></script>
+    <script src="./static/js/parse.js"></script>
 </body>
 </html>

@@ -1,3 +1,9 @@
+:root {
+    --clr-neon: #4666FF;
+    --clr-bk: #001f3f;
+    --light-txt: #ffffff;
+}
+
 *{
     margin: 0;
     padding: 0;
@@ -6,6 +12,11 @@
 
 ul {
     list-style-type: none;
+}
+
+.btn {
+    cursor: pointer;
+    color: var(--light-txt);
 }
 
 .container{
@@ -18,7 +29,8 @@ ul {
     flex: 0 0 150px;
     height: 100%;
     padding: 10px 1em;
-    background: lightslategray;
+    background: var(--clr-bk);
+    color: var(--light-txt);
 }
 
 .container > .content{
@@ -33,14 +45,17 @@ ul {
     gap: 10px;
 }
 
-table tr td{
+table, tr, td, th{
     border-collapse: collapse;
     gap: 18px;
 }
 
-td{
-    padding: 0 5px 3px 0;
-}
+td, th{padding: 0 5px 3px 0;}
+
+.hidden{display: none;}
+
+.f12{font-size: 12px;}
+.f14{font-size: 14px;}
 
 .margin-10{margin: 10px;}
 .margin-v-20{
