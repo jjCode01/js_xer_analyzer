@@ -1,19 +1,18 @@
+// app.js
+
+/*
+TODO:
+    
+*/
+
+
+
 let tables = {
     "current": {},
     "previous": {}
 }
 
-let projects = {
-    // "current": {},
-    // "previous": {}
-}
-
-let changes = {
-    addedTasks: [],
-    deletedTasks: [],
-    names: [],
-    durations: [],
-}
+let projects = {}
 
 function updateProjCard(el){
     let proj = tables[el.name]["PROJECT"][el.value]
@@ -35,38 +34,9 @@ function updateProjList(projects, selector) {
     updateProjCard(selector)
 }
 
-function formatDate(dt) {
+const formatDate = dt => {
     const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return dt.getDate() + "-" + M[dt.getMonth()] + "-" + dt.getFullYear()
-}
-
-function findChanges(proj1, proj2){
-    currTasks = {}
-    prevTasks = {}
-    proj1.tasks.forEach(t => currTasks[t.task_code] = t)
-    proj2.tasks.forEach(t => prevTasks[t.task_code] = t)
-
-    // Find task changes
-    Object.entries(currTasks).forEach(([key, task]) => {
-        if (!prevTasks[key]){changes.addedTasks.push(task)}  // Found Added Task
-        else{
-            const prev = prevTasks[key]
-            if (task.task_name != prev.task_name){  // Found Name Change
-                changes.names.push({current: task, previous: prev})
-            }
-
-            if (task.target_drtn_hr_cnt != prev.target_drtn_hr_cnt){
-                changes.durations.push({current: task, previous: prev})
-            }
-        }
-    })
-
-    // Find deleted tasks
-    Object.entries(prevTasks).forEach(([key, val]) => {
-        if (!currTasks[key]){
-            changes.deletedTasks.push(val)
-        }
-    })
 }
 
 let fileSelectors = document.getElementsByTagName("input")
@@ -89,10 +59,31 @@ for (let i = 0; i < projSelectors.length; i++) {
     })
 }
 
+let changes = {}
+
 document.getElementById('compare').addEventListener("click", () => {
     if (projects.current && projects.previous) {
-        findChanges(projects.current, projects.previous)
-        // changes.addedTasks.rows.forEach(t => console.log(`${t.task_code} - ${t.task_name}`))
-        changes.names.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} --- ${t.previous.task_name}`))
+        changes = findChanges(projects.current, projects.previous)
+
+        console.log("\nAdded Tasks")
+        changes.addedTasks.forEach(t => console.log(`${t.task_code} - ${t.task_name}`))
+
+        console.log("\nDeleted Tasks")
+        changes.deletedTasks.forEach(t => console.log(`${t.task_code} - ${t.task_name}`))
+
+        console.log("\nTask Name Changes")
+        changes.names.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} <==> ${t.previous.task_name}`))
+
+        console.log("\nOriginal Duration Changes")
+        changes.durations.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${t.current.target_drtn_hr_cnt / 8} <==> ${t.previous.target_drtn_hr_cnt / 8}`))
+
+        console.log("\nCalendar Changes")
+        changes.calendars.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${t.current.calendar.clndr_name} <==> ${t.previous.calendar.clndr_name}`))
+
+        console.log("\nActual Start Changes")
+        changes.actualStarts.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${formatDate(t.current.start)} <==> ${formatDate(t.previous.start)}`))
+        
+        console.log("\nActual Finish Changes")
+        changes.actualFinishes.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${formatDate(t.current.finish)} <==> ${formatDate(t.previous.finish)}`))
     }
 })
