@@ -1,6 +1,6 @@
 
 
-function findChanges(proj1, proj2){
+function findTaskChanges(proj1, proj2){
     let changes = {
         addedTasks: [],
         deletedTasks: [],
@@ -42,7 +42,6 @@ function findChanges(proj1, proj2){
             }
 
             // Find Actual Start changes
-            console.log(task.notStarted)
             if (!task.notStarted && !prev.notStarted) {
                 if (formatDate(task.start) != formatDate(prev.start)) {
                     changes.actualStarts.push({current: task, previous: prev})

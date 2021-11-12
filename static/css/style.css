@@ -45,19 +45,24 @@ ul {
     gap: 10px;
 }
 
-table, tr, td, th{
-    border-collapse: collapse;
-    gap: 18px;
+table{
+    border-spacing: 1em .5em;
+    font-size: 11px;
 }
 
-td, th{padding: 0 5px 3px 0;}
+td th{padding: 0 5px 3px 0;}
 
 .hidden{display: none;}
 
+.f11{font-size: 11px;}
 .f12{font-size: 12px;}
 .f14{font-size: 14px;}
 
 .margin-10{margin: 10px;}
+.margin-t-10{margin-top: 10px;}
+.margin-t-20{margin-top: 20px;}
+.margin-b-10{margin-bottom: 10px}
+.margin-h-10{margin: 0 10px}
 .margin-v-20{
     margin-top: 20px;
     margin-bottom: 20px;

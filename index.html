@@ -25,8 +25,8 @@
 
         <div class="content">
             <section id="project">
-                <h2 class="txt-center">Projects</h2>
-                <div class="pad-1em border-rad-5 box-shadow margin-10 margin-v-20">
+                <h2 class="hidden">Projects</h2>
+                <div class="pad-1em">
                     <h3 class="pad-bm-05em">File Upload</h3>
                     <div class="upload-wrap grid pad-bm-1em">
                         <label for="current-file-selector">Current XER: </label>
@@ -42,12 +42,12 @@
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
-                    <button id="compare" class="margin-v-20">Compare</button>
+                    <button id="compare" class="margin-t-20">Compare</button>
                 </div>
-                <div class="card pad-1em border-rad-5 box-shadow margin-10 margin-v-20">
+                <div class="card pad-1em">
                     <div class="pad-bm-1em">
                         <h3 class="pad-bm-05em">Current Project</h3>
-                        <table class="f14">
+                        <table class="f13">
                             <tr>
                                 <td>Project ID:</td>
                                 <td id="current-project-id"></td>
@@ -64,7 +64,7 @@
                     </div>
                     <div>
                         <h3 class="pad-bm-05em">Previous Project</h3>
-                        <table class="f14">
+                        <table class="f13">
                             <tr>
                                 <td>Project ID:</td>
                                 <td id="previous-project-id"></td>
@@ -80,7 +80,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="card pad-1em border-rad-5 box-shadow margin-10 margin-v-20"">
+                <!-- <div class="card pad-1em border-rad-5 box-shadow margin-10 margin-v-20"">
                     <h3 class="pad-bm-05em">Schedule Dates</h3>
                     <table class="f14">
                         <tr>
@@ -106,15 +106,16 @@
                             <td>Must Finish By:</td>
                         </tr>
                     </table>
-                </div>
+                </div> -->
             </section>
 
-            <section id="changes hidden">
-                <h2 class="txt-center">Changes</h2>
+            <section id="changes" class="">
+                <h2 class="hidden">Changes</h2>
+                <!-- <div class="card pad-1em border-rad-5 box-shadow margin-10 margin-v-20" id="addedTasks"></div> -->
             </section>
 
-            <section id="updates hidden">
-                <h2 class="txt-center">Updates</h2>
+            <section id="updates" class="">
+                <h2 class="hidden">Updates</h2>
             </section>
         </div>
     </div>
