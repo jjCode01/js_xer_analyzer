@@ -34,10 +34,10 @@ function updateProjList(projects, selector) {
     updateProjCard(selector)
 }
 
-const formatDate = dt => {
-    const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    return dt.getDate() + "-" + M[dt.getMonth()] + "-" + dt.getFullYear()
-}
+// const formatDate = dt => {
+//     const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+//     return dt.getDate() + "-" + M[dt.getMonth()] + "-" + dt.getFullYear()
+// }
 
 let fileSelectors = document.getElementsByTagName("input")
 for (let i = 0; i < fileSelectors.length; i++){
@@ -59,7 +59,9 @@ for (let i = 0; i < projSelectors.length; i++) {
     })
 }
 
-let changes = {}
+let taskChanges = {}
+let logicChanges = {}
+let updates = {}
 
 const createTable = columns => {
     let table = document.createElement("table")
@@ -75,9 +77,16 @@ const createTable = columns => {
 
 const createCard = change => {
     const div = document.createElement("div")
-    div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
     const title = document.createElement("h3")
-    title.classList.add("f14")
+    if (change.rows.length) {
+        div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
+        title.classList.add("f14")
+    }
+    else {
+        div.classList.add("card", "pad-h-1em", "margin-10", "f-reg")
+        title.classList.add("f14", "f-reg")
+    }
+
     title.innerHTML = `${change.desc}: ${change.rows.length}`
     div.appendChild(title)
     if (change.rows.length){
@@ -98,55 +107,35 @@ const createCard = change => {
 document.getElementById('compare').addEventListener("click", () => {
     if (projects.current && projects.previous) {
         document.getElementById("upload").classList.add("hidden")
-        changes = findTaskChanges(projects.current, projects.previous)
+        taskChanges = findTaskChanges(projects.current, projects.previous)
+        logicChanges = findLogicChanges(projects.current, projects.previous)
+        updates = findUpdates(projects.current, projects.previous)
 
-        for (change in changes){
-            document.getElementById('changes').appendChild(createCard(changes[change]))
+        for (let change in taskChanges){
+            if (taskChanges[change].rows.length) {
+                document.getElementById('changes').appendChild(createCard(taskChanges[change]))
+            }
+            else {
+                document.getElementById('no-changes').appendChild(createCard(taskChanges[change]))
+            }
         }
 
-        // Added tasks
-        // let card = new CardDiv(`Added Tasks: ${changes.addedTasks.length}`)
-        // if (changes.addedTasks.length) {
-        //     let addedTaskTable = createTable(["ID", "Task Name"])
-        //     changes.addedTasks.forEach((task, i) => {
-        //         row = addedTaskTable.insertRow()
-        //         if (!(i % 2)) {row.classList.add("oddRow")}
-        //         ['task_code', 'task_name'].forEach(value => {
-        //             cell = row.insertCell()
-        //             cell.innerHTML = task[value]
-        //         })
-        //     })
-        //     card.div.appendChild(addedTaskTable)
-        // }
-        // document.getElementById('changes').appendChild(card.div)
+        for (let change in logicChanges){
+            if (logicChanges[change].rows.length) {
+                document.getElementById('changes').appendChild(createCard(logicChanges[change]))
+            }
+            else {
+                document.getElementById('no-changes').appendChild(createCard(logicChanges[change]))
+            }
+        }
 
-        // Deleted tasks
-        // div = createCard(`Deleted Tasks: ${changes.deletedTasks.length}`)
-        // if (changes.deletedTasks.length){
-        //     let deletedTaskTable = createTable(["ID", "Task Name"])
-        //     changes.deletedTasks.forEach((task, i) => {
-        //         row = deletedTaskTable.insertRow()
-        //         if (!(i % 2)) {row.classList.add("oddRow")}
-        //         ['task_code', 'task_name'].forEach(value => {
-        //             cell = row.insertCell()
-        //             cell.innerHTML = task[value]
-        //         })
-        //     })
-        //     div.appendChild(deletedTaskTable)
-        // }
-        // document.getElementById('changes').appendChild(div)
-
-        // Name changes
-        // div = createCard(`Task Name Changes: ${changes.names.length}`)
-        // if (changes.names.length){
-        //     let nameChangeTable = createTable(["ID", "New Name", "Old Name"])
-        //     changes.names.forEach((task, i) => {
-        //         row = nameChangeTable.insertRow()
-        //         if (!(i % 2)) {row.classList.add("oddRow+")}
-        //     })
-
-        //     div.appendChild(nameChangeTable)
-        // }
-        // document.getElementById('changes').appendChild(div)
+        for (let update in updates){
+            if (updates[update].rows.length) {
+                document.getElementById('yes-updates').appendChild(createCard(updates[update]))
+            }
+            else {
+                document.getElementById('no-updates').appendChild(createCard(updates[update]))
+            }
+        }
     }
 })

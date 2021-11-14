@@ -6,7 +6,7 @@ const task_status = {
 
 
 function setDataType(col, val) {
-    if (val == ''){return}
+    if (!val){return}
     if (col.endsWith('_date') || col.endsWith('_date2')){return new Date(val.split(" ").join("T"))}
     if (col.endsWith('_num')){return parseInt(val)}
     for (c in ['_cnt', '_qty', '_cost']){
@@ -37,7 +37,8 @@ function parseFile(file){
 
             if (currTable == "PROJECT"){
                 tables['PROJECT'][row['proj_id']] = row
-                tables['PROJECT'][row['proj_id']].tasks = []
+                // tables['PROJECT'][row['proj_id']].tasks = []
+                tables['PROJECT'][row['proj_id']].tasks = new Map()
                 tables['PROJECT'][row['proj_id']].rels = []
             }
             if (currTable == "PROJWBS"){
@@ -59,7 +60,7 @@ function parseFile(file){
                 if (row.completed){row.finish = row.act_end_date}
                 else {row.finish = row.early_end_date}
 
-                tables['PROJECT'][row['proj_id']].tasks.push(row)    
+                tables['PROJECT'][row.proj_id].tasks.set(row.task_id, row)    
             }
             if (currTable == "TASKPRED"){
                 tables['PROJECT'][row['proj_id']].rels.push(row)
