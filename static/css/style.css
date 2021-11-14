@@ -7,7 +7,7 @@
 *{
     margin: 0;
     padding: 0;
-    font-family: 'Rubik', sans-serif;
+    font-family: Helvetica, sans-serif;
 }
 
 ul {
@@ -17,6 +17,11 @@ ul {
 .btn {
     cursor: pointer;
     color: var(--light-txt);
+    background: var(--clr-bk);
+    padding: 0.75em;
+    align-content: center;
+    border: solid 2px black;
+    border-radius: 8px;
 }
 
 .container{
@@ -46,11 +51,19 @@ ul {
 }
 
 table{
-    border-spacing: 1em .5em;
-    font-size: 11px;
+    /* border-spacing: 1em 0.75em 1.5em 0; */
+    border-collapse: collapse;
+    font-size: 12px;
 }
 
-td th{padding: 0 5px 3px 0;}
+td, th{
+    padding: 3px 10px 3px 5px;
+    text-align: left;
+}
+
+th{border-bottom: solid 1px gray;}
+
+.oddRow{background: lightsteelblue;}
 
 .hidden{display: none;}
 
@@ -70,6 +83,7 @@ td th{padding: 0 5px 3px 0;}
 
 .txt-center{text-align: center;}
 
+.pad-05em{padding: 0.5em;}
 .pad-1em{padding: 1em;}
 .pad-tp-1em{padding-top: 1em;}
 .pad-bm-1em {padding-bottom: 1em;}

@@ -63,6 +63,7 @@ let changes = {}
 
 const createTable = columns => {
     let table = document.createElement("table")
+    table.classList.add("margin-t-10")
     let row = table.insertRow(), cell;
     columns.forEach(value => {
         cell = document.createElement("th")
@@ -72,77 +73,80 @@ const createTable = columns => {
     return table
 }
 
-const createCard = description => {
-    let div = document.createElement("div")
+const createCard = change => {
+    const div = document.createElement("div")
     div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
-    let title = document.createElement("h3")
-    title.innerHTML = description
+    const title = document.createElement("h3")
+    title.classList.add("f14")
+    title.innerHTML = `${change.desc}: ${change.rows.length}`
     div.appendChild(title)
+    if (change.rows.length){
+        const table = createTable(change.labels)
+        change.rows.forEach((task, i) => {
+            row = table.insertRow()
+            if (!(i % 2)) {row.classList.add("oddRow")}
+            task.forEach(value => {
+                cell = row.insertCell()
+                cell.innerHTML = value
+            })
+        })
+        div.appendChild(table)
+    }
     return div
 }
 
 document.getElementById('compare').addEventListener("click", () => {
     if (projects.current && projects.previous) {
+        document.getElementById("upload").classList.add("hidden")
         changes = findTaskChanges(projects.current, projects.previous)
 
-        // Added tasks
-        let div = createCard(`Added Tasks: ${changes.addedTasks.length}`)
-        // let div = document.createElement("div")
-        // div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
-        if (changes.addedTasks) {
-            let addedTaskTable = createTable(["ID", "Task Name"])
-            changes.addedTasks.forEach(task => {
-                row = addedTaskTable.insertRow();
-                ['task_code', 'task_name'].forEach(value => {
-                    cell = row.insertCell()
-                    cell.innerHTML = task[value]
-                })
-            })
-            div.appendChild(addedTaskTable)
+        for (change in changes){
+            document.getElementById('changes').appendChild(createCard(changes[change]))
         }
-        document.getElementById('changes').appendChild(div)
+
+        // Added tasks
+        // let card = new CardDiv(`Added Tasks: ${changes.addedTasks.length}`)
+        // if (changes.addedTasks.length) {
+        //     let addedTaskTable = createTable(["ID", "Task Name"])
+        //     changes.addedTasks.forEach((task, i) => {
+        //         row = addedTaskTable.insertRow()
+        //         if (!(i % 2)) {row.classList.add("oddRow")}
+        //         ['task_code', 'task_name'].forEach(value => {
+        //             cell = row.insertCell()
+        //             cell.innerHTML = task[value]
+        //         })
+        //     })
+        //     card.div.appendChild(addedTaskTable)
+        // }
+        // document.getElementById('changes').appendChild(card.div)
 
         // Deleted tasks
-        div = createCard(`Deleted Tasks: ${changes.deletedTasks.length}`)
-        // div = document.createElement("div")
-        // div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
-        if (changes.deletedTasks){
-            let deletedTaskTable = createTable(["ID", "Task Name"])
-
-            div.appendChild(deletedTaskTable)
-        }
-        document.getElementById('changes').appendChild(div)
+        // div = createCard(`Deleted Tasks: ${changes.deletedTasks.length}`)
+        // if (changes.deletedTasks.length){
+        //     let deletedTaskTable = createTable(["ID", "Task Name"])
+        //     changes.deletedTasks.forEach((task, i) => {
+        //         row = deletedTaskTable.insertRow()
+        //         if (!(i % 2)) {row.classList.add("oddRow")}
+        //         ['task_code', 'task_name'].forEach(value => {
+        //             cell = row.insertCell()
+        //             cell.innerHTML = task[value]
+        //         })
+        //     })
+        //     div.appendChild(deletedTaskTable)
+        // }
+        // document.getElementById('changes').appendChild(div)
 
         // Name changes
-        div = createCard(`Task Name Changes: ${changes.names.length}`)
-        // div = document.createElement("div")
-        // div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
-        if (changes.names){
-            let nameChangeTable = createTable(["ID", "New Name", "Old Name"])
+        // div = createCard(`Task Name Changes: ${changes.names.length}`)
+        // if (changes.names.length){
+        //     let nameChangeTable = createTable(["ID", "New Name", "Old Name"])
+        //     changes.names.forEach((task, i) => {
+        //         row = nameChangeTable.insertRow()
+        //         if (!(i % 2)) {row.classList.add("oddRow+")}
+        //     })
 
-            div.appendChild(nameChangeTable)
-        }
-        document.getElementById('changes').appendChild(div)
-
-        // console.log("\nAdded Tasks")
-        // changes.addedTasks.forEach(t => console.log(`${t.task_code} - ${t.task_name}`))
-
-        // console.log("\nDeleted Tasks")
-        // changes.deletedTasks.forEach(t => console.log(`${t.task_code} - ${t.task_name}`))
-
-        // console.log("\nTask Name Changes")
-        // changes.names.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} <==> ${t.previous.task_name}`))
-
-        // console.log("\nOriginal Duration Changes")
-        // changes.durations.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${t.current.target_drtn_hr_cnt / 8} <==> ${t.previous.target_drtn_hr_cnt / 8}`))
-
-        // console.log("\nCalendar Changes")
-        // changes.calendars.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${t.current.calendar.clndr_name} <==> ${t.previous.calendar.clndr_name}`))
-
-        // console.log("\nActual Start Changes")
-        // changes.actualStarts.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${formatDate(t.current.start)} <==> ${formatDate(t.previous.start)}`))
-        
-        // console.log("\nActual Finish Changes")
-        // changes.actualFinishes.forEach(t => console.log(`${t.current.task_code} - ${t.current.task_name} | ${formatDate(t.current.finish)} <==> ${formatDate(t.previous.finish)}`))
+        //     div.appendChild(nameChangeTable)
+        // }
+        // document.getElementById('changes').appendChild(div)
     }
 })

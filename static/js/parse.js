@@ -61,7 +61,9 @@ function parseFile(file){
 
                 tables['PROJECT'][row['proj_id']].tasks.push(row)    
             }
-            if (currTable == "TASKPRED"){tables['PROJECT'][row['proj_id']].rels.push(row)}
+            if (currTable == "TASKPRED"){
+                tables['PROJECT'][row['proj_id']].rels.push(row)
+            }
         }
     }
     return tables
