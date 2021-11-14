@@ -9,9 +9,7 @@ function setDataType(col, val) {
     if (!val){return}
     if (col.endsWith('_date') || col.endsWith('_date2')){return new Date(val.split(" ").join("T"))}
     if (col.endsWith('_num')){return parseInt(val)}
-    for (c in ['_cnt', '_qty', '_cost']){
-        if (col.endsWith(c)){return parseFloat(val)}
-    }
+    if (col.endsWith('_cost') || col.endsWith('_qty') || col.endsWith('_cnt')){return parseFloat(val)}
     return val
 }
 
@@ -36,10 +34,12 @@ function parseFile(file){
             }
 
             if (currTable == "PROJECT"){
-                tables['PROJECT'][row['proj_id']] = row
+                tables['PROJECT'][row.proj_id] = row
                 // tables['PROJECT'][row['proj_id']].tasks = []
-                tables['PROJECT'][row['proj_id']].tasks = new Map()
-                tables['PROJECT'][row['proj_id']].rels = []
+                tables['PROJECT'][row.proj_id].tasks = new Map()
+                tables['PROJECT'][row.proj_id].tasksByCode = new Map()
+                tables['PROJECT'][row.proj_id].rels = []
+                tables['PROJECT'][row.proj_id].resources = []
             }
             if (currTable == "PROJWBS"){
                 if (row['proj_node_flag'] == "Y"){
@@ -53,6 +53,7 @@ function parseFile(file){
                 row.longestPath = (row.driving_path_flag == "Y")
                 row.status = task_status[row.status_code]
                 row.calendar = tables.CALENDAR[row.clndr_id]
+                row.resources = []
 
                 if (row.notStarted) { row.start = row.early_start_date }
                 else { row.start = row.act_start_date}
@@ -60,12 +61,21 @@ function parseFile(file){
                 if (row.completed){row.finish = row.act_end_date}
                 else {row.finish = row.early_end_date}
 
-                tables['PROJECT'][row.proj_id].tasks.set(row.task_id, row)    
+                tables['PROJECT'][row.proj_id].tasks.set(row.task_id, row)
+                tables['PROJECT'][row.proj_id].tasksByCode.set(row.task_code, row)   
             }
             if (currTable == "TASKPRED"){
                 tables['PROJECT'][row['proj_id']].rels.push(row)
             }
+            if (currTable == "TASKRSRC"){
+                tables.PROJECT[row.proj_id].resources.push(row)
+                tables.PROJECT[row.proj_id].tasks.get(row.task_id).resources.push(row)
+            }
         }
     }
+
+    for (let proj in tables.PROJECT){
+        console.log(`${tables.PROJECT[proj].proj_short_name}: ${budgetedCost(tables.PROJECT[proj])}`)
+    } 
     return tables
 }

@@ -7,11 +7,6 @@ class Change{
     add(values) {this.rows.push(values)}
 }
 
-const formatDate = dt => {
-    const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    return dt.getDate() + "-" + M[dt.getMonth()] + "-" + dt.getFullYear()
-}
-
 const findLogicChanges = (proj1, proj2) => {
     const changes = {
         addedLogic: new Change(
@@ -28,8 +23,6 @@ const findLogicChanges = (proj1, proj2) => {
         )
 
     }
-    const currTasks = new Map(proj1.tasks.map(t => [t.task_id, t])) 
-    const prevTasks = new Map(proj2.tasks.map(t => [t.task_id, t]))
 
     const setRelKey = (tasks, logic) => {
         const succID = tasks.get(logic.task_id).task_code
@@ -37,8 +30,8 @@ const findLogicChanges = (proj1, proj2) => {
         return `${succID}|${predID}|${logic.pred_type}`
     }
 
-    const currLogic = new Map(proj1.rels.map(r => [setRelKey(currTasks, r), r]))
-    const prevLogic = new Map(proj2.rels.map(r => [setRelKey(prevTasks, r), r]))
+    const currLogic = new Map(proj1.rels.map(r => [setRelKey(proj1.tasks, r), r]))
+    const prevLogic = new Map(proj2.rels.map(r => [setRelKey(proj2.tasks, r), r]))
 
     const newLogicChange = (change, rel, tasks) => {
         const pred = tasks.get(rel.pred_task_id);
@@ -54,12 +47,12 @@ const findLogicChanges = (proj1, proj2) => {
     }
 
     currLogic.forEach((rel, key) => {
-        if (!prevLogic.has(key)) {newLogicChange(changes.addedLogic, rel, currTasks)}
+        if (!prevLogic.has(key)) {newLogicChange(changes.addedLogic, rel, proj1.tasks)}
         else {
             const prev = prevLogic.get(key);
             if (rel.lag != prev.lag) {
-                const pred = currTasks.get(rel.pred_task_id);
-                const succ = currTasks.get(rel.task_id);
+                const pred = proj1.tasks.get(rel.pred_task_id);
+                const succ = proj1.tasks.get(rel.task_id);
                 changes.revisedLogic.add([
                     pred.task_code,
                     pred.task_name,
@@ -76,7 +69,7 @@ const findLogicChanges = (proj1, proj2) => {
 
     // Deleted Relationships
     prevLogic.forEach((rel, key) => {
-        if (!currLogic.has(key)) {newLogicChange(changes.deletedLogic, rel, prevTasks)}    
+        if (!currLogic.has(key)) {newLogicChange(changes.deletedLogic, rel, proj2.tasks)}    
     })
     return changes
 }
@@ -104,12 +97,10 @@ const findUpdates = (proj1, proj2) => {
         //     ["Task ID", "Task Name", "Budgeted Cost", "New Actual Cost", "Old Actual Cost", "Var"]
         // )
     }
-    const currTasks = new Map(proj1.tasks.map(t => [t.task_code, t])) 
-    const prevTasks = new Map(proj2.tasks.map(t => [t.task_code, t]))
 
-    currTasks.forEach((task, key) => {
-        if (prevTasks.has(key)) {
-            const prev = prevTasks.get(key);
+    proj1.tasksByCode.forEach((task, key) => {
+        if (proj2.tasksByCode.has(key)) {
+            const prev = proj2.tasksByCode.get(key);
             if (!task.notStarted && prev.notStarted) {
                 updates.started.add([
                     task.task_code,
@@ -127,8 +118,6 @@ const findUpdates = (proj1, proj2) => {
                 ])
             }
             if (task.remain_drtn_hr_cnt != prev.remain_drtn_hr_cnt) {
-                // const newDurPercent = (1 - (task.remain_drtn_hr_cnt / task.target_drtn_hr_cnt)) * 100
-                // const oldDurPercent = (1 - (prev.remain_drtn_hr_cnt / prev.target_drtn_hr_cnt)) * 100
                 updates.remainingDuration.add([
                     task.task_code,
                     task.task_name,
@@ -136,9 +125,6 @@ const findUpdates = (proj1, proj2) => {
                     (task.remain_drtn_hr_cnt / 8),
                     (prev.remain_drtn_hr_cnt / 8),
                     (task.remain_drtn_hr_cnt / 8 - prev.remain_drtn_hr_cnt / 8).toFixed(2),
-                    // `${newDurPercent}%`,
-                    // `${oldDurPercent}%`,
-                    // `${newDurPercent - oldDurPercent}%`
                 ])
             }
             if (task.phys_complete_pct != prev.phys_complete_pct) {
@@ -188,20 +174,17 @@ const findTaskChanges = (proj1, proj2) => {
         )
     }
 
-    const currTasks = new Map(proj1.tasks.map(t => [t.task_code, t])) 
-    const prevTasks = new Map(proj2.tasks.map(t => [t.task_code, t]))
-
     // Find task changes
-    currTasks.forEach((task, key) => {
+    proj1.tasksByCode.forEach((task, key) => {
         // Find added tasks
-        if (!prevTasks.has(key)) {
+        if (!proj2.tasksByCode.has(key)) {
             changes.addedTasks.add([
                 task.task_code,
                 task.task_name
             ])
         }
         else {
-            const prev = prevTasks.get(key)
+            const prev = proj2.tasksByCode.get(key)
 
             // Find Name Change
             if (task.task_name != prev.task_name){
@@ -261,8 +244,8 @@ const findTaskChanges = (proj1, proj2) => {
         }
     })
 
-    Object.entries(prevTasks).forEach(([key, task]) => {
-        if (!currTasks[key]){
+    proj2.tasksByCode.forEach((task, key) => {
+        if (!proj1.tasksByCode.has(key)) {
             changes.deletedTasks.add([
                 task.task_code,
                 task.task_name
