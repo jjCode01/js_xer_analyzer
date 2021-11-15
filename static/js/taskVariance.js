@@ -92,10 +92,10 @@ const findUpdates = (proj1, proj2) => {
             "Updated Physical Percent Complete",
             ["Task ID", "Task Name", "Status", "New<br>% Comp", "Old<br>% Comp", "Var"]
         ),
-        // actualCost: new Change(
-        //     "Updated Actual Cost",
-        //     ["Task ID", "Task Name", "Budgeted Cost", "New Actual Cost", "Old Actual Cost", "Var"]
-        // )
+        actualCost: new Change(
+            "Updated Actual Cost",
+            ["Task ID", "Task Name", "Budgeted Cost", "New<br>Actual Cost", "Old<br>Actual Cost", "Var"]
+        )
     }
 
     proj1.tasksByCode.forEach((task, key) => {
@@ -135,6 +135,16 @@ const findUpdates = (proj1, proj2) => {
                     `${task.phys_complete_pct}%`,
                     `${prev.phys_complete_pct}%`,
                     `${(task.phys_complete_pct - prev.phys_complete_pct)}%`,
+                ])
+            }
+            if (actualCost(task) != actualCost(prev)){
+                updates.actualCost.add([
+                    task.task_code,
+                    task.task_name,
+                    budgetedCost(task).toFixed(2),
+                    actualCost(task).toFixed(2),
+                    actualCost(prev).toFixed(2),
+                    (actualCost(task) - actualCost(prev)).toFixed(2)
                 ])
             }
         }

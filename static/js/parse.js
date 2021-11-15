@@ -30,20 +30,19 @@ function parseFile(file){
             columns.forEach((k, i) => {row[k] = setDataType(k, cols[i])})
 
             if (currTable == "CALENDAR"){
-                tables['CALENDAR'][row['clndr_id']] = row
+                tables['CALENDAR'][row.clndr_id] = row
             }
 
             if (currTable == "PROJECT"){
                 tables['PROJECT'][row.proj_id] = row
-                // tables['PROJECT'][row['proj_id']].tasks = []
                 tables['PROJECT'][row.proj_id].tasks = new Map()
                 tables['PROJECT'][row.proj_id].tasksByCode = new Map()
                 tables['PROJECT'][row.proj_id].rels = []
                 tables['PROJECT'][row.proj_id].resources = []
             }
             if (currTable == "PROJWBS"){
-                if (row['proj_node_flag'] == "Y"){
-                    tables['PROJECT'][row['proj_id']]['proj_long_name'] = row['wbs_name']
+                if (row.proj_node_flag == "Y"){
+                    tables.PROJECT[row.proj_id].proj_long_name = row.wbs_name
                 }
             }
             if (currTable == "TASK"){
@@ -61,11 +60,11 @@ function parseFile(file){
                 if (row.completed){row.finish = row.act_end_date}
                 else {row.finish = row.early_end_date}
 
-                tables['PROJECT'][row.proj_id].tasks.set(row.task_id, row)
-                tables['PROJECT'][row.proj_id].tasksByCode.set(row.task_code, row)   
+                tables.PROJECT[row.proj_id].tasks.set(row.task_id, row)
+                tables.PROJECT[row.proj_id].tasksByCode.set(row.task_code, row)   
             }
             if (currTable == "TASKPRED"){
-                tables['PROJECT'][row['proj_id']].rels.push(row)
+                tables.PROJECT[row['proj_id']].rels.push(row)
             }
             if (currTable == "TASKRSRC"){
                 tables.PROJECT[row.proj_id].resources.push(row)
