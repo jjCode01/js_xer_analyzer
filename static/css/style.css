@@ -45,6 +45,17 @@ ul {
     padding: 10px 1em;
 }
 
+.data{
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    /* border-left: solid 1px lightgray;
+    border-right: solid 1px lightgray;
+    box-shadow: inset 0 0 5px #4665ff3d;
+    border-radius: 2px;
+    margin: 0; */
+}
+
 .grid{
     display: grid;
     gap: 10px;
@@ -66,6 +77,8 @@ th{
 }
 
 .oddRow{background: rgba(176, 196, 222, 0.25);}
+
+.cursor-pointer{cursor: pointer;}
 
 .hidden{display: none;}
 

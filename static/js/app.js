@@ -61,6 +61,7 @@ for (let i = 0; i < projSelectors.length; i++) {
 
 let taskChanges = {}
 let logicChanges = {}
+let rsrcChanges = {}
 let updates = {}
 
 const createTable = columns => {
@@ -80,7 +81,7 @@ const createCard = change => {
     const title = document.createElement("h3")
     if (change.rows.length) {
         div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
-        title.classList.add("f14")
+        title.classList.add("f14", "collapsible", "cursor-pointer")
     }
     else {
         div.classList.add("card", "pad-h-1em", "margin-10", "f-reg")
@@ -90,6 +91,8 @@ const createCard = change => {
     title.innerHTML = `${change.desc}: ${change.rows.length}`
     div.appendChild(title)
     if (change.rows.length){
+        const innerDiv = document.createElement("div")
+        innerDiv.classList.add("data")
         const table = createTable(change.labels)
         change.rows.forEach((task, i) => {
             row = table.insertRow()
@@ -99,7 +102,8 @@ const createCard = change => {
                 cell.innerHTML = value
             })
         })
-        div.appendChild(table)
+        innerDiv.appendChild(table)
+        div.appendChild(innerDiv)
     }
     return div
 }
@@ -109,6 +113,7 @@ document.getElementById('compare').addEventListener("click", () => {
         document.getElementById("upload").classList.add("hidden")
         taskChanges = findTaskChanges(projects.current, projects.previous)
         logicChanges = findLogicChanges(projects.current, projects.previous)
+        rsrcChanges = findResourceChanges(projects.current, projects.previous)
         updates = findUpdates(projects.current, projects.previous)
 
         for (let change in taskChanges){
@@ -129,6 +134,15 @@ document.getElementById('compare').addEventListener("click", () => {
             }
         }
 
+        for (let change in rsrcChanges){
+            if (rsrcChanges[change].rows.length) {
+                document.getElementById('changes').appendChild(createCard(rsrcChanges[change]))
+            }
+            else {
+                document.getElementById('no-changes').appendChild(createCard(rsrcChanges[change]))
+            }
+        }
+
         for (let update in updates){
             if (updates[update].rows.length) {
                 document.getElementById('yes-updates').appendChild(createCard(updates[update]))
@@ -136,6 +150,19 @@ document.getElementById('compare').addEventListener("click", () => {
             else {
                 document.getElementById('no-updates').appendChild(createCard(updates[update]))
             }
+        }
+
+        const coll = document.getElementsByClassName("collapsible");
+
+        for (let i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function() {
+                const content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } 
+            });
         }
     }
 })

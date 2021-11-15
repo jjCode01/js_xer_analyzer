@@ -45,6 +45,9 @@ function parseFile(file){
                     tables.PROJECT[row.proj_id].proj_long_name = row.wbs_name
                 }
             }
+            if (currTable == "RSRC"){
+                tables["RSRC"][row.rsrc_id] = row
+            }
             if (currTable == "TASK"){
                 row.notStarted = (row.status_code == "TK_NotStart")
                 row.inProgress = (row.status_code == "TK_Active")
@@ -67,14 +70,13 @@ function parseFile(file){
                 tables.PROJECT[row['proj_id']].rels.push(row)
             }
             if (currTable == "TASKRSRC"){
+                row.rsrc_name = tables.RSRC[row.rsrc_id].rsrc_short_name
+                row.task = tables.PROJECT[row.proj_id].tasks.get(row.task_id)
                 tables.PROJECT[row.proj_id].resources.push(row)
                 tables.PROJECT[row.proj_id].tasks.get(row.task_id).resources.push(row)
             }
         }
     }
 
-    for (let proj in tables.PROJECT){
-        console.log(`${tables.PROJECT[proj].proj_short_name}: ${budgetedCost(tables.PROJECT[proj])}`)
-    } 
     return tables
 }

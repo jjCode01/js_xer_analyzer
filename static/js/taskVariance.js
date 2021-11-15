@@ -152,6 +152,69 @@ const findUpdates = (proj1, proj2) => {
     return updates
 }
 
+const findResourceChanges = (proj1, proj2) => {
+    const changes = {
+        addedResources: new Change(
+            "Added Resources",
+            ["Task ID", "Task Name", "Resource", "Budgeted QTY", "Budgeted Cost"]
+        ),
+        deletedResources: new Change(
+            "Deleted Resources",
+            ["Task ID", "Task Name", "Resource", "Budgeted QTY", "Budgeted Cost"]
+        ),
+        revisedCost: new Change(
+            "Revised Budgeted Cost",
+            ["Task ID", "Task Name", "Resource", "New<br>Budgeted Cost", "Old<br>Budgeted Cost", "Var"]
+        ),
+        revisedQty: new Change(
+            "Revised Budgeted Quantity",
+            ["Task ID", "Task Name", "Resource", "New<br>Budgeted Qty", "Old<br>Budgeted Qty", "Var"]
+        )
+    }
+
+    currRsrcs = new Map(proj1.resources.map(r => [`${r.task.task_code}|${r.rsrc_name}`, r])) 
+    prevRsrcs = new Map(proj2.resources.map(r => [`${r.task.task_code}|${r.rsrc_name}`, r])) 
+
+    currRsrcs.forEach((rsrc, key) => {
+        if (!prevRsrcs.has(key)) {
+            changes.addedResources.add([
+                rsrc.task.task_code,
+                rsrc.task.task_name,
+                rsrc.rsrc_name,
+                rsrc.target_qty.toFixed(2),
+                rsrc.target_cost.toFixed(2)
+            ])
+        }
+        else {
+            prev = prevRsrcs.get(key)
+            if (rsrc.target_cost != prev.target_cost){
+                changes.revisedCost.add([
+                    rsrc.task.task_code,
+                    rsrc.task.task_name,
+                    rsrc.rsrc_name,
+                    rsrc.target_cost.toFixed(2),
+                    prev.target_cost.toFixed(2),
+                    (rsrc.target_cost - prev.target_cost).toFixed(2)
+                ])
+            }
+        }
+    })
+
+    prevRsrcs.forEach((rsrc, key) => {
+        if (!currRsrcs.has(key)) {
+            changes.deletedResources.add([
+                rsrc.task.task_code,
+                rsrc.task.task_name,
+                rsrc.rsrc_name,
+                rsrc.target_qty.toFixed(2),
+                rsrc.target_cost.toFixed(2)
+            ])
+        }
+    })
+
+    return changes
+}
+
 const findTaskChanges = (proj1, proj2) => {
     const changes = {
         addedTasks: new Change(
