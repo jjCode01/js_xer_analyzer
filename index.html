@@ -13,14 +13,14 @@
         <aside class="menu">
             <header class="f14"><h1>XER Analyzer</h1></header>
             <ul>
-                <li class="btn margin-t-20">Project</li>
-                <li class="btn margin-t-20">Changes</li>
-                <li class="btn margin-t-20">Updates</li>
+                <li id="projects-btn" class="tablinks btn margin-t-20" onclick="clickHandle(event, 'project')">Projects</li>
+                <li id="changes-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'changes')">Changes</li>
+                <li id="updates-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'updates')">Updates</li>
             </ul>
         </aside>
 
         <div class="content">
-            <section id="project">
+            <section id="project" class="cat">
                 <h2 class="hidden">Projects</h2>
                 <div id="upload" class="pad-1em">
                     <h3 class="pad-bm-05em">File Upload</h3>
@@ -78,21 +78,27 @@
                 </div>
             </section>
 
-            <section id="changes" class="">
+            <section id="changes" class="hidden cat">
                 <h2 class="hidden">Changes</h2>
-            </section>
-
-            <section id="no-changes" class="">
+                <div id="yes-changes"></div>
                 <h2 class="hidden">No Changes</h2>
+                <div id="no-changes"></div>
             </section>
 
-            <section id="yes-updates" class="">
+            <!-- <section id="no-changes" class="">
+                <h2 class="hidden">No Changes</h2>
+            </section> -->
+
+            <section id="updates" class="hidden cat">
                 <h2 class="hidden">Updates</h2>
+                <div id="yes-updates"></div>
+                <h2 class="hidden">No Updates</h2>
+                <div id="no-updates"></div>
             </section>
 
-            <section id="no-updates" class="">
+            <!-- <section id="no-updates" class="">
                 <h2 class="hidden">No Updates</h2>
-            </section>
+            </section> -->
         </div>
     </div>
 

@@ -108,9 +108,25 @@ const createCard = change => {
     return div
 }
 
+function clickHandle(evt, id) {
+    let x, tablinks;
+    x = document.getElementsByClassName("cat");
+    for (let i = 0; i < x.length; i++) {
+      x[i].style.display = "none";
+    }
+    // tablinks = document.getElementsByClassName("tablinks");
+    // for (i = 0; i < x.length; i++) {
+    //   tablinks[i].className = tablinks[i].className.replace(" blue_but", "");
+    // }
+    document.getElementById(id).style.display = "grid";
+    // evt.currentTarget.className += " blue_but";
+}
+
 document.getElementById('compare').addEventListener("click", () => {
     if (projects.current && projects.previous) {
         document.getElementById("upload").classList.add("hidden")
+        document.getElementById("changes-btn").classList.toggle("hidden")
+        document.getElementById("updates-btn").classList.toggle("hidden")
         taskChanges = findTaskChanges(projects.current, projects.previous)
         logicChanges = findLogicChanges(projects.current, projects.previous)
         rsrcChanges = findResourceChanges(projects.current, projects.previous)
@@ -118,7 +134,7 @@ document.getElementById('compare').addEventListener("click", () => {
 
         for (let change in taskChanges){
             if (taskChanges[change].rows.length) {
-                document.getElementById('changes').appendChild(createCard(taskChanges[change]))
+                document.getElementById('yes-changes').appendChild(createCard(taskChanges[change]))
             }
             else {
                 document.getElementById('no-changes').appendChild(createCard(taskChanges[change]))
@@ -127,7 +143,7 @@ document.getElementById('compare').addEventListener("click", () => {
 
         for (let change in logicChanges){
             if (logicChanges[change].rows.length) {
-                document.getElementById('changes').appendChild(createCard(logicChanges[change]))
+                document.getElementById('yes-changes').appendChild(createCard(logicChanges[change]))
             }
             else {
                 document.getElementById('no-changes').appendChild(createCard(logicChanges[change]))
@@ -136,7 +152,7 @@ document.getElementById('compare').addEventListener("click", () => {
 
         for (let change in rsrcChanges){
             if (rsrcChanges[change].rows.length) {
-                document.getElementById('changes').appendChild(createCard(rsrcChanges[change]))
+                document.getElementById('yes-changes').appendChild(createCard(rsrcChanges[change]))
             }
             else {
                 document.getElementById('no-changes').appendChild(createCard(rsrcChanges[change]))
