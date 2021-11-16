@@ -82,7 +82,7 @@ const findUpdates = (proj1, proj2) => {
         ),
         finished: new Change(
             "Activities Finished",
-            ["Task ID", "Task Name", "Actual Start", "Status"]
+            ["Task ID", "Task Name", "Actual Finish", "Status"]
         ),
         remainingDuration: new Change(
             "Updated Remaining Durations",
@@ -141,10 +141,10 @@ const findUpdates = (proj1, proj2) => {
                 updates.actualCost.add([
                     task.task_code,
                     task.task_name,
-                    budgetedCost(task).toFixed(2),
-                    actualCost(task).toFixed(2),
-                    actualCost(prev).toFixed(2),
-                    (actualCost(task) - actualCost(prev)).toFixed(2)
+                    formatCost(budgetedCost(task)),
+                    formatCost(actualCost(task)),
+                    formatCost(actualCost(prev)),
+                    formatCost((actualCost(task) - actualCost(prev)))
                 ])
             }
         }
@@ -182,7 +182,7 @@ const findResourceChanges = (proj1, proj2) => {
                 rsrc.task.task_name,
                 rsrc.rsrc_name,
                 rsrc.target_qty.toFixed(2),
-                rsrc.target_cost.toFixed(2)
+                formatCost(rsrc.target_cost)
             ])
         }
         else {
@@ -192,9 +192,9 @@ const findResourceChanges = (proj1, proj2) => {
                     rsrc.task.task_code,
                     rsrc.task.task_name,
                     rsrc.rsrc_name,
-                    rsrc.target_cost.toFixed(2),
-                    prev.target_cost.toFixed(2),
-                    (rsrc.target_cost - prev.target_cost).toFixed(2)
+                    formatCost(rsrc.target_cost),
+                    formatCost(prev.target_cost),
+                    formatCost((rsrc.target_cost - prev.target_cost))
                 ])
             }
         }
@@ -207,7 +207,7 @@ const findResourceChanges = (proj1, proj2) => {
                 rsrc.task.task_name,
                 rsrc.rsrc_name,
                 rsrc.target_qty.toFixed(2),
-                rsrc.target_cost.toFixed(2)
+                formatCost(rsrc.target_cost)
             ])
         }
     })

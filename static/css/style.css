@@ -2,6 +2,7 @@
     --clr-neon: #4666FF;
     --clr-bk: #001f3f;
     --light-txt: #ffffff;
+    --clr-hover: #003a74;
 }
 
 *{
@@ -20,8 +21,9 @@ ul {
     background: var(--clr-bk);
     padding: 0.75em;
     align-content: center;
-    border: solid 2px black;
     border-radius: 8px;
+    transition: 0.3s;
+    border: none;
 }
 
 .container{
@@ -49,11 +51,6 @@ ul {
     max-height: 0px;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
-    /* border-left: solid 1px lightgray;
-    border-right: solid 1px lightgray;
-    box-shadow: inset 0 0 5px #4665ff3d;
-    border-radius: 2px;
-    margin: 0; */
 }
 
 .grid{
@@ -126,3 +123,22 @@ th{
 .box-shadow{
     box-shadow: 0 0 10px 2px rgba(119, 136, 153, 0.25);
 }
+
+.active-btn {
+    background: var(--clr-neon);
+    color: var(--light-txt);
+    box-shadow: 0 0 1em black;
+}
+
+.btn:hover {
+    background-color: var(--clr-neon);
+    color: whitesmoke;
+}
+
+.collapsible::before {
+    content: '\025BC'; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: #4666FF;
+    text-shadow: 0px 0px 1px black;
+  }
+  

@@ -13,7 +13,7 @@
         <aside class="menu">
             <header class="f14"><h1>XER Analyzer</h1></header>
             <ul>
-                <li id="projects-btn" class="tablinks btn margin-t-20" onclick="clickHandle(event, 'project')">Projects</li>
+                <li id="projects-btn" class="tablinks btn margin-t-20 active-btn" onclick="clickHandle(event, 'project')">Projects</li>
                 <li id="changes-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'changes')">Changes</li>
                 <li id="updates-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'updates')">Updates</li>
             </ul>
@@ -52,10 +52,6 @@
                                 <td>Project Name:</td>
                                 <td id="current-project-name"></td>
                             </tr>
-                            <tr>
-                                <td>Data Date:</td>
-                                <td id="current-dd"></td>
-                            </tr>     
                         </table>
                     </div>
                     <div>
@@ -69,12 +65,78 @@
                                 <td>Project Name:</td>
                                 <td id="previous-project-name"></td>
                             </tr>
-                            <tr>
-                                <td>Data Date:</td>
-                                <td id="previous-dd"></td>
-                            </tr>     
                         </table>
                     </div>
+                </div>
+                <div class="card pad-1em">
+                    <h3 class="pad-bm-05em">Schedule Dates</h3>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th class="txt-center">Curr</th>
+                            <th class="txt-center">Prev</th>
+                            <th class="txt-right">Var</th>
+                        </tr>
+                        <tr>
+                            <td>Start Date:</td>
+                            <td id="current-start" class="txt-center"></td>
+                            <td id="previous-start" class="txt-center"></td>
+                            <td id="start-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>Data Date:</td>
+                            <td id="current-data-date" class="txt-center"></td>
+                            <td id="previous-data-date" class="txt-center"></td>
+                            <td id="dd-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>End Date:</td>
+                            <td id="current-end" class="txt-center"></td>
+                            <td id="previous-end" class="txt-center"></td>
+                            <td id="end-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>Must Finish By:</td>
+                            <td id="current-mfb" class="txt-center"></td>
+                            <td id="previous-mfb" class="txt-center"></td>
+                            <td id="mfb-var" class="txt-right"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card pad-1em">
+                    <h3 class="pad-bm-05em">Cost Loading</h3>
+                    <table>
+                        <tr>
+                            <th >Cost</th>
+                            <th class="txt-center">Curr</th>
+                            <th class="txt-center">Prev</th>
+                            <th class="txt-center">Var</th>
+                        </tr>
+                        <tr>
+                            <td>Budgeted Cost:</td>
+                            <td id="current-budget" class="txt-right"></td>
+                            <td id="previous-budget" class="txt-right"></td>
+                            <td id="budget-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>Cost To Date:</td>
+                            <td id="current-actual-cost" class="txt-right"></td>
+                            <td id="previous-actual-cost" class="txt-right"></td>
+                            <td id="actual-cost-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>This Period:</td>
+                            <td id="current-this-period" class="txt-right"></td>
+                            <td id="previous-this-period" class="txt-right"></td>
+                            <td id="this-period-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>Remaining Cost:</td>
+                            <td id="current-remaining-cost" class="txt-right"></td>
+                            <td id="previous-remaining-cost" class="txt-right"></td>
+                            <td id="remaining-cost-var" class="txt-right"></td>
+                        </tr>
+                    </table>
                 </div>
             </section>
 

@@ -19,7 +19,22 @@ function updateProjCard(el){
     projects[el.name] = proj
     document.getElementById(`${el.name}-project-id`).innerHTML = proj['proj_short_name']
     document.getElementById(`${el.name}-project-name`).innerHTML = proj['proj_long_name']
-    document.getElementById(`${el.name}-dd`).innerHTML = formatDate(proj['last_recalc_date'])
+    
+    document.getElementById(`${el.name}-start`).innerHTML = formatDate(proj['plan_start_date'])
+    document.getElementById(`${el.name}-data-date`).innerHTML = formatDate(proj['last_recalc_date'])
+    document.getElementById(`${el.name}-end`).innerHTML = formatDate(proj['scd_end_date'])
+
+    if (proj.plan_end_date){
+        document.getElementById(`${el.name}-mfb`).innerHTML = formatDate(proj['plan_end_date'])
+    }
+    else {
+        document.getElementById(`${el.name}-mfb`).innerHTML = "None"
+    }
+
+    document.getElementById(`${el.name}-budget`).innerHTML = formatCost(budgetedCost(proj))
+    document.getElementById(`${el.name}-actual-cost`).innerHTML = formatCost(actualCost(proj))
+    document.getElementById(`${el.name}-this-period`).innerHTML = formatCost(thisPeriodCost(proj))
+    document.getElementById(`${el.name}-remaining-cost`).innerHTML = formatCost(remainingCost(proj))
 }
 
 function updateProjList(projects, selector) {
@@ -33,11 +48,6 @@ function updateProjList(projects, selector) {
     }
     updateProjCard(selector)
 }
-
-// const formatDate = dt => {
-//     const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-//     return dt.getDate() + "-" + M[dt.getMonth()] + "-" + dt.getFullYear()
-// }
 
 let fileSelectors = document.getElementsByTagName("input")
 for (let i = 0; i < fileSelectors.length; i++){
@@ -114,12 +124,12 @@ function clickHandle(evt, id) {
     for (let i = 0; i < x.length; i++) {
       x[i].style.display = "none";
     }
-    // tablinks = document.getElementsByClassName("tablinks");
-    // for (i = 0; i < x.length; i++) {
-    //   tablinks[i].className = tablinks[i].className.replace(" blue_but", "");
-    // }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < x.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active-btn", "");
+    }
     document.getElementById(id).style.display = "grid";
-    // evt.currentTarget.className += " blue_but";
+    evt.currentTarget.classList.add("active-btn");
 }
 
 document.getElementById('compare').addEventListener("click", () => {
@@ -131,6 +141,38 @@ document.getElementById('compare').addEventListener("click", () => {
         logicChanges = findLogicChanges(projects.current, projects.previous)
         rsrcChanges = findResourceChanges(projects.current, projects.previous)
         updates = findUpdates(projects.current, projects.previous)
+
+        let startVar = projects.current.plan_start_date.getTime() - projects.previous.plan_start_date.getTime()
+        startVar = startVar / (1000 * 3600 * 24)
+        document.getElementById("start-var").innerHTML = startVar
+
+        let ddVar = projects.current.last_recalc_date.getTime() - projects.previous.last_recalc_date.getTime()
+        ddVar = ddVar / (1000 * 3600 * 24)
+        document.getElementById("dd-var").innerHTML = ddVar
+
+        let endVar = projects.current.scd_end_date.getTime() - projects.previous.scd_end_date.getTime()
+        endVar = endVar / (1000 * 3600 * 24)
+        document.getElementById("end-var").innerHTML = endVar
+
+        let budgetVar = budgetedCost(projects.current) - budgetedCost(projects.previous)
+        document.getElementById("budget-var").innerHTML = formatCost(budgetVar)
+
+        let actualVar = actualCost(projects.current) - actualCost(projects.previous)
+        document.getElementById("actual-cost-var").innerHTML = formatCost(actualVar)
+
+        let thisPeriodVar = thisPeriodCost(projects.current) - thisPeriodCost(projects.previous)
+        document.getElementById("this-period-var").innerHTML = formatCost(thisPeriodVar)
+
+        let remainingVar = remainingCost(projects.current) - remainingCost(projects.previous)
+        document.getElementById("remaining-cost-var").innerHTML = formatCost(remainingVar)
+
+        if (projects.current.plan_end_date && projects.previous.plan_end_date) {
+            let mfbVar = projects.current.plan_end_date.getTime() - projects.previous.plan_end_date.getTime()
+            mfbVar = mfbVar / (1000 * 3600 * 24)
+            document.getElementById("mfb-var").innerHTML = mfbVar
+        } else {
+            document.getElementById("mfb-var").innerHTML = "N/A"
+        }
 
         for (let change in taskChanges){
             if (taskChanges[change].rows.length) {
