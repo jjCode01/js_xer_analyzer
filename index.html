@@ -16,6 +16,7 @@
                 <li id="projects-btn" class="tablinks btn margin-t-20 active-btn" onclick="clickHandle(event, 'project')">Projects</li>
                 <li id="changes-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'changes')">Changes</li>
                 <li id="updates-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'updates')">Updates</li>
+                <li id="critical-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'critical')">Critical Path</li>
             </ul>
         </aside>
 
@@ -146,21 +147,35 @@
                 <h2 class="hidden">No Changes</h2>
                 <div id="no-changes"></div>
             </section>
-
-            <!-- <section id="no-changes" class="">
-                <h2 class="hidden">No Changes</h2>
-            </section> -->
-
             <section id="updates" class="hidden cat">
                 <h2 class="hidden">Updates</h2>
                 <div id="yes-updates"></div>
                 <h2 class="hidden">No Updates</h2>
                 <div id="no-updates"></div>
             </section>
-
-            <!-- <section id="no-updates" class="">
-                <h2 class="hidden">No Updates</h2>
-            </section> -->
+            <section id="critical" class="hidden cat">
+                <h2 class="hidden">Critical Path</h2>
+                <div id="current-critical">
+                    <h3 class="pad-bm-05em">Current Critical Path</h3>
+                    
+                </div>
+                <div id="previous-critical">
+                    <h3 class="pad-bm-05em">Previous Critical Path</h3>
+                    <table>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Prev Start</th>
+                            <th>Curr Start</th>
+                            <th>Start<br>Var</th>
+                            <th>Prev Finish</th>
+                            <th>Curr Finish</th>
+                            <th>Finish<br>Var</th>
+                            <th>Total<br>Float</th>
+                        </tr>
+                    </table>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -168,5 +183,7 @@
     <script src="./static/js/parse.js"></script>
     <script src="./static/js/taskVariance.js"></script>
     <script src="./static/js/utilities.js"></script>
+    <script src="./static/js/variance.js"></script>
+    <script src="./static/js/objects.js"></script>
 </body>
 </html>

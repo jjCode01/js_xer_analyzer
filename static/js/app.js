@@ -24,12 +24,8 @@ function updateProjCard(el){
     document.getElementById(`${el.name}-data-date`).innerHTML = formatDate(proj['last_recalc_date'])
     document.getElementById(`${el.name}-end`).innerHTML = formatDate(proj['scd_end_date'])
 
-    if (proj.plan_end_date){
-        document.getElementById(`${el.name}-mfb`).innerHTML = formatDate(proj['plan_end_date'])
-    }
-    else {
-        document.getElementById(`${el.name}-mfb`).innerHTML = "None"
-    }
+    if (proj.plan_end_date){document.getElementById(`${el.name}-mfb`).innerHTML = formatDate(proj['plan_end_date'])}
+    else {document.getElementById(`${el.name}-mfb`).innerHTML = "None"}
 
     document.getElementById(`${el.name}-budget`).innerHTML = formatCost(budgetedCost(proj))
     document.getElementById(`${el.name}-actual-cost`).innerHTML = formatCost(actualCost(proj))
@@ -38,7 +34,7 @@ function updateProjCard(el){
 }
 
 function updateProjList(projects, selector) {
-    for(let i = selector.options.length - 1; i >= 0; i--) {selector.remove(i);}
+    for (let i = selector.options.length - 1; i >= 0; i--) {selector.remove(i);}
     for (const proj in projects){
         let p = projects[proj]
         let el = document.createElement("option")
@@ -49,18 +45,18 @@ function updateProjList(projects, selector) {
     updateProjCard(selector)
 }
 
-let fileSelectors = document.getElementsByTagName("input")
-for (let i = 0; i < fileSelectors.length; i++){
+let fileSelectors = document.getElementsByTagName("input");
+for (let i = 0; i < fileSelectors.length; i++) {
     fileSelectors[i].addEventListener("change", (e) => {
         let reader = new FileReader();
-        let projSelector = document.getElementById(`${e.target.name}-project-selector`)
+        let projSelector = document.getElementById(`${e.target.name}-project-selector`);
         reader.onload = (r) => {
-            tables[e.target.name] = parseFile(r.target.result)
-            updateProjList(tables[e.target.name]['PROJECT'], projSelector)
+            tables[e.target.name] = parseFile(r.target.result);
+            updateProjList(tables[e.target.name]['PROJECT'], projSelector);
         };
         reader.readAsText(e.target.files[0], "cp1252");
     })
-}
+};
 
 let projSelectors = document.getElementsByTagName('select')
 for (let i = 0; i < projSelectors.length; i++) {
@@ -137,10 +133,14 @@ document.getElementById('compare').addEventListener("click", () => {
         document.getElementById("upload").classList.add("hidden")
         document.getElementById("changes-btn").classList.toggle("hidden")
         document.getElementById("updates-btn").classList.toggle("hidden")
+        document.getElementById("critical-btn").classList.toggle("hidden")
         taskChanges = findTaskChanges(projects.current, projects.previous)
         logicChanges = findLogicChanges(projects.current, projects.previous)
         rsrcChanges = findResourceChanges(projects.current, projects.previous)
         updates = findUpdates(projects.current, projects.previous)
+
+        const currentCriticalPathTable = parseCriticalPath(projects.current, projects.previous)
+        document.getElementById("current-critical").appendChild(currentCriticalPathTable)
 
         let startVar = projects.current.plan_start_date.getTime() - projects.previous.plan_start_date.getTime()
         startVar = startVar / (1000 * 3600 * 24)
