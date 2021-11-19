@@ -19,11 +19,18 @@ ul {
     cursor: pointer;
     color: var(--light-txt);
     background: var(--clr-bk);
-    padding: 0.75em;
+    padding: 0.6em;
     align-content: center;
     border-radius: 8px;
     transition: 0.3s;
     border: none;
+}
+
+.card{
+    /* border: solid 1px gray; */
+    background: rgba(218, 231, 240, 0.342);
+    border-radius: 8px;
+    box-shadow: 5px 5px 15px 5px rgb(224, 224, 224);
 }
 
 .container{
@@ -32,12 +39,46 @@ ul {
     height: calc(100vh - 20px);
 }
 
+section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2em;
+}
+
+section > .upload {
+    width: 100%;
+}
+
+section > .project-names {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2em;
+}
+
+.proj > table {
+    width: 100%;
+}
+
+.project-names > .proj {
+    min-width: 330px;
+}
+
+section > .info {
+    min-width: 330px;
+}
+
+.info > table {
+    width: 100%;
+}
+
 .container > aside{
-    flex: 0 0 150px;
+    flex: 0 0 115px;
     height: 100%;
-    padding: 10px 1em;
+    padding: 10px 10px;
     background: var(--clr-bk);
     color: var(--light-txt);
+    box-shadow: inset -1em 0 1em -1em black;
 }
 
 .container > .content{
@@ -55,12 +96,18 @@ ul {
 
 .grid{
     display: grid;
-    gap: 10px;
+    gap: 15px;
 }
 
 table{
     border-collapse: collapse;
     font-size: 12px;
+    border-bottom: solid 1px gray;
+    transition: 0.3s;
+}
+
+section{
+    flex: 1 1;
 }
 
 td, th{
@@ -89,6 +136,7 @@ th{
 
 .margin-10{margin: 10px;}
 .margin-t-10{margin-top: 10px;}
+.margin-t-15{margin-top: 15px;}
 .margin-t-20{margin-top: 20px;}
 .margin-b-10{margin-bottom: 10px}
 .margin-h-10{margin: 0 10px}
@@ -100,6 +148,7 @@ th{
     margin-top: 10px;
     margin-bottom: 10px;
 }
+.margin-t-20-h-auto{margin: 20px auto;}
 
 
 .txt-center{text-align: center;}

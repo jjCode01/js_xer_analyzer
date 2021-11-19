@@ -124,7 +124,7 @@ function clickHandle(evt, id) {
     for (i = 0; i < x.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active-btn", "");
     }
-    document.getElementById(id).style.display = "grid";
+    document.getElementById(id).style.display = "flex";
     evt.currentTarget.classList.add("active-btn");
 }
 
@@ -139,20 +139,20 @@ document.getElementById('compare').addEventListener("click", () => {
         rsrcChanges = findResourceChanges(projects.current, projects.previous)
         updates = findUpdates(projects.current, projects.previous)
 
-        const currentCriticalPathTable = parseCriticalPath(projects.current, projects.previous)
-        document.getElementById("current-critical").appendChild(currentCriticalPathTable)
+        const criticalPathTable = parseCriticalPath(projects.current, projects.previous)
+        document.getElementById("current-critical").appendChild(criticalPathTable)
 
         let startVar = projects.current.plan_start_date.getTime() - projects.previous.plan_start_date.getTime()
         startVar = startVar / (1000 * 3600 * 24)
-        document.getElementById("start-var").innerHTML = startVar
+        document.getElementById("start-var").innerHTML = startVar.toFixed(0)
 
         let ddVar = projects.current.last_recalc_date.getTime() - projects.previous.last_recalc_date.getTime()
         ddVar = ddVar / (1000 * 3600 * 24)
-        document.getElementById("dd-var").innerHTML = ddVar
+        document.getElementById("dd-var").innerHTML = ddVar.toFixed(0)
 
         let endVar = projects.current.scd_end_date.getTime() - projects.previous.scd_end_date.getTime()
         endVar = endVar / (1000 * 3600 * 24)
-        document.getElementById("end-var").innerHTML = endVar
+        document.getElementById("end-var").innerHTML = endVar.toFixed(0)
 
         let budgetVar = budgetedCost(projects.current) - budgetedCost(projects.previous)
         document.getElementById("budget-var").innerHTML = formatCost(budgetVar)
@@ -169,7 +169,7 @@ document.getElementById('compare').addEventListener("click", () => {
         if (projects.current.plan_end_date && projects.previous.plan_end_date) {
             let mfbVar = projects.current.plan_end_date.getTime() - projects.previous.plan_end_date.getTime()
             mfbVar = mfbVar / (1000 * 3600 * 24)
-            document.getElementById("mfb-var").innerHTML = mfbVar
+            document.getElementById("mfb-var").innerHTML = mfbVar.toFixed(0)
         } else {
             document.getElementById("mfb-var").innerHTML = "N/A"
         }

@@ -1,26 +1,62 @@
+const sortByDate = (a, b) => {
+    if (a.finish.getDate() === b.finish.getDate()) {return a.start < b.start ? -1 : 1}
+    return a.finish < b.finish ? -1 : 1
+}
+
 const parseCriticalPath = (proj1, proj2) => {
-    let cp = [...proj1.tasks.values()].filter(task => task.longestPath).sort((a, b) => a.finish - b.finish)
-    const criticalPath = new Map(cp.map(task => [task.task_code, task]))
+    let currentCP = new Map([...proj1.tasks.values()].filter(task => task.longestPath).map(task => [task.task_code, task]))
+    let previousCP = new Map([...proj2.tasks.values()].filter(task => task.longestPath).map(task => [task.task_code, task]))
+
+    let criticalPath = [...currentCP.values()].concat([...previousCP.values()].filter(task => !currentCP.has(task.task_code)))
+    criticalPath = criticalPath.sort((a, b) => sortByDate(a, b))
+
     if (!criticalPath) {return}
+
     const labels = [
-        ["Task ID", ""], ["Task Name", ""], ["Status", ""], ["Other<br>Start", ""], ["Start", ""],
-        ["Start<br>Var", "center"], ["Other<br>Finish", ""], ["Finish", ""], ["Finish Var", "center"]
+        ["Task ID", ""], ["Task Name", ""], ["Status", ""],
+        ["Previous<br>Start", "txt-center"], ["Current<br>Start", "txt-center"], ["Start<br>Var", "txt-center"],
+        ["Previous<br>Finish", "txt-center"], ["Current<br>Finish", "txt-center"], ["Finish<br>Var", "txt-center"],
+        ["Current<br>CP", "txt-center"], ["Previous<br>CP", "txt-center"]
     ]
+
     const table = createNewTable(labels)
-    criticalPath.forEach((task, key) => {
-        let vals
-        if (!proj2.tasksByCode.has(key)) {
-            vals = [[task.task_code, ""], [task.task_name, ""], [task.status, ""], ["", ""], [formatDate(task.start), ""], ["", ""], ["", ""], [formatDate(task.finish), ""]]
+    let vals
+    criticalPath.forEach(task => {
+        if (!proj2.tasksByCode.has(task.task_code)) {
+            // Task added in current schedule
+            vals = [
+                [task.task_code, ""], [task.task_name, ""], [task.status, ""],
+                ["", ""], [formatDate(task.start), ""], ["", ""], 
+                ["", ""], [formatDate(task.finish), ""], ["", ""],
+                ['&#10003;', "txt-center"], ["", "txt-center"]
+            ]
+            addTableRow(table, vals)
+        } else if (!proj1.tasksByCode.has(task.task_code)) {
+            // Task deleted in current schedule
+            vals = [
+                [task.task_code, ""], [task.task_name, ""], ["Deleted", ""],
+                [formatDate(task.start), ""], ["", ""], ["", ""],
+                [formatDate(task.finish), ""], ["", ""], ["", ""],
+                ["", "txt-center"], ['&#10003;', "txt-center"]
+            ]
+            addTableRow(table, vals)
+        } else if (!proj2.tasksByCode.get(task.task_code).completed) {
+            const prev = proj2.tasksByCode.get(task.task_code)
+
+            const startVar = dateVarianceDays(prev.start, task.start)
+            const finishVar = dateVarianceDays(prev.finish, task.finish)
+
+            const isCurrCP = currentCP.has(task.task_code) ? '&#10003;' : ""
+            const isPrevCP = previousCP.has(task.task_code) ? '&#10003;' : ""
+
+            vals = [
+                [task.task_code, ""], [task.task_name, ""], [task.status, ""],
+                [formatDate(prev.start), ""], [formatDate(task.start), ""], [startVar, "txt-center"],
+                [formatDate(prev.finish), ""], [formatDate(task.finish), ""], [finishVar, "txt-center"],
+                [isCurrCP, "txt-center"], [isPrevCP, "txt-center"]
+            ]
             addTableRow(table, vals)
         }
-        else if (!proj2.tasksByCode.get(key).completed) {
-            const prev = proj2.tasksByCode.get(key)
-            const startVar = dateVarianceDays(task.start, prev.start)
-            const finishVar = dateVarianceDays(task.finish, prev.finish)
-            vals = [[task.task_code, ""], [task.task_name, ""], [task.status, ""], [formatDate(prev.start), ""], [formatDate(task.start), ""], [startVar, ""], [formatDate(prev.finish), ""], [formatDate(task.finish), ""], [finishVar, ""]]
-            addTableRow(table, vals)
-        }
-        
     })
     return table
 }

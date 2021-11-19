@@ -217,30 +217,6 @@ const findResourceChanges = (proj1, proj2) => {
     return changes
 }
 
-// const addTableRow = (table, values) => {
-//     let row = table.insertRow(), cell;
-//     values.forEach(value => {
-//         cell.document.createElement("td")
-//         cell.innerHTML = value[0]
-//         if (value[1]) {cell.classList.add(`txt-${value[1]}`)}
-//         row.appendChild(cell)
-//     })
-// }
-
-// const createNewTable = (colHeaders) => {
-//     let table = document.createElement("table")
-//     table.classList.add("margin-t-10")
-//     let row = table.insertRow(), cell;
-//     colHeaders.forEach(label => {
-//         cell = document.createElement("th")
-//         cell.innerHTML = label[0]
-//         if (label[1]) {cell.classList.add(`txt-${label[1]}`)}
-//         row.appendChild(cell)
-//     })
-//     return table
-// }
-
-
 
 const findTaskChanges = (proj1, proj2) => {
     const changes = {

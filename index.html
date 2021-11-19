@@ -11,19 +11,19 @@
 <body>
     <div class="container">
         <aside class="menu">
-            <header class="f14"><h1>XER Analyzer</h1></header>
+            <header class="f14"><h1 class="txt-center">XER Analyzer</h1></header>
             <ul>
-                <li id="projects-btn" class="tablinks btn margin-t-20 active-btn" onclick="clickHandle(event, 'project')">Projects</li>
-                <li id="changes-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'changes')">Changes</li>
-                <li id="updates-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'updates')">Updates</li>
-                <li id="critical-btn" class="hidden tablinks btn margin-t-20" onclick="clickHandle(event, 'critical')">Critical Path</li>
+                <li id="projects-btn" class="tablinks btn margin-t-15 active-btn" onclick="clickHandle(event, 'project')">Projects</li>
+                <li id="changes-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'changes')">Changes</li>
+                <li id="updates-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'updates')">Updates</li>
+                <li id="critical-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'critical')">Critical Path</li>
             </ul>
         </aside>
 
         <div class="content">
-            <section id="project" class="cat">
-                <h2 class="hidden">Projects</h2>
-                <div id="upload" class="pad-1em">
+            <section id="upload">
+                <h2 class="hidden">File Upload</h2>
+                <div class="pad-1em upload">
                     <h3 class="pad-bm-05em">File Upload</h3>
                     <div class="upload-wrap grid pad-bm-1em">
                         <label for="current-file-selector">Current XER: </label>
@@ -39,11 +39,14 @@
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
-                    <button id="compare" class="btn margin-t-20">Compare</button>
+                    <button id="compare" class="btn margin-t-20-h-auto txt-center">Compare</button>
                 </div>
-                <div class="card pad-1em">
-                    <div class="pad-bm-1em">
-                        <h3 class="pad-bm-05em">Current Project</h3>
+            </section>
+            <section id="project" class="cat">
+                <h2 class="hidden">Projects</h2>
+                <div class="card pad-1em project-names">
+                    <div class="pad-bm-1em proj">
+                        <h3 class="pad-bm-05em txt-center">Current Project</h3>
                         <table class="f13">
                             <tr>
                                 <td>Project ID:</td>
@@ -55,8 +58,8 @@
                             </tr>
                         </table>
                     </div>
-                    <div>
-                        <h3 class="pad-bm-05em">Previous Project</h3>
+                    <div class="proj">
+                        <h3 class="pad-bm-05em txt-center">Previous Project</h3>
                         <table class="f13">
                             <tr>
                                 <td>Project ID:</td>
@@ -69,8 +72,8 @@
                         </table>
                     </div>
                 </div>
-                <div class="card pad-1em">
-                    <h3 class="pad-bm-05em">Schedule Dates</h3>
+                <div class="card pad-1em info">
+                    <h3 class="pad-bm-05em txt-center">Schedule Dates</h3>
                     <table>
                         <tr>
                             <th>Date</th>
@@ -104,11 +107,11 @@
                         </tr>
                     </table>
                 </div>
-                <div class="card pad-1em">
-                    <h3 class="pad-bm-05em">Cost Loading</h3>
+                <div class="card pad-1em info">
+                    <h3 class="pad-bm-05em txt-center">Cost Loading</h3>
                     <table>
                         <tr>
-                            <th >Cost</th>
+                            <th>Cost</th>
                             <th class="txt-center">Curr</th>
                             <th class="txt-center">Prev</th>
                             <th class="txt-center">Var</th>
@@ -139,6 +142,41 @@
                         </tr>
                     </table>
                 </div>
+                <div class="card pad-1em info">
+                    <h3 class="pad-bm-05em txt-center">Activity Counts</h3>
+                    <table>
+                        <tr>
+                            <th>Count</th>
+                            <th class="txt-center">Curr</th>
+                            <th class="txt-center">Prev</th>
+                            <th class="txt-center">Var</th>
+                        </tr>
+                        <tr>
+                            <td>Activities:</td>
+                            <td id="current-tasks" class="txt-right"></td>
+                            <td id="previous-tasks" class="txt-right"></td>
+                            <td id="tasks-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>Not Started:</td>
+                            <td id="current-not-started" class="txt-right"></td>
+                            <td id="previous-not-started" class="txt-right"></td>
+                            <td id="not-started-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>In Progress:</td>
+                            <td id="current-in-progress" class="txt-right"></td>
+                            <td id="previous-in-progress" class="txt-right"></td>
+                            <td id="in-progress-var" class="txt-right"></td>
+                        </tr>
+                        <tr>
+                            <td>Complete:</td>
+                            <td id="current-complete" class="txt-right"></td>
+                            <td id="previous-complete" class="txt-right"></td>
+                            <td id="remaining-complete" class="txt-right"></td>
+                        </tr>
+                    </table>
+                </div>
             </section>
 
             <section id="changes" class="hidden cat">
@@ -155,25 +193,8 @@
             </section>
             <section id="critical" class="hidden cat">
                 <h2 class="hidden">Critical Path</h2>
-                <div id="current-critical">
-                    <h3 class="pad-bm-05em">Current Critical Path</h3>
-                    
-                </div>
-                <div id="previous-critical">
-                    <h3 class="pad-bm-05em">Previous Critical Path</h3>
-                    <table>
-                        <tr>
-                            <th>Task ID</th>
-                            <th>Task Name</th>
-                            <th>Prev Start</th>
-                            <th>Curr Start</th>
-                            <th>Start<br>Var</th>
-                            <th>Prev Finish</th>
-                            <th>Curr Finish</th>
-                            <th>Finish<br>Var</th>
-                            <th>Total<br>Float</th>
-                        </tr>
-                    </table>
+                <div class="card pad-1em" id="current-critical">
+                    <h3 class="pad-bm-05em txt-center">Critical Path Comparison</h3>
                 </div>
             </section>
         </div>
