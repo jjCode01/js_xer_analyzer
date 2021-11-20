@@ -5,7 +5,12 @@ const sortByDate = (a, b) => {
 
 const parseCriticalPath = (proj1, proj2) => {
     let currentCP = new Map([...proj1.tasks.values()].filter(task => task.longestPath).map(task => [task.task_code, task]))
-    let previousCP = new Map([...proj2.tasks.values()].filter(task => task.longestPath).map(task => [task.task_code, task]))
+    let previousCP = new Map([...proj2.tasks.values()].filter(task => task.longestPath).map(task => {
+        if (proj1.tasksByCode.has(task.task_code)){
+            return [task.task_code, proj1.tasksByCode.get(task.task_code)]
+        }
+        return [task.task_code, task]
+    }))
 
     let criticalPath = [...currentCP.values()].concat([...previousCP.values()].filter(task => !currentCP.has(task.task_code)))
     criticalPath = criticalPath.sort((a, b) => sortByDate(a, b))

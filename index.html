@@ -23,29 +23,29 @@
         <div class="content">
             <section id="upload">
                 <h2 class="hidden">File Upload</h2>
-                <div class="pad-1em upload">
+                <div class="card pad-1em margin-20 upload">
                     <h3 class="pad-bm-05em">File Upload</h3>
                     <div class="upload-wrap grid pad-bm-1em">
                         <label for="current-file-selector">Current XER: </label>
                         <input type="file" name="current" id="current-file-selector" accept=".xer" required>
-                        <select name="current" id="current-project-selector">
+                        <select name="current" id="current-project-selector" class="f14">
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
                     <div class="upload-wrap grid">
                         <label for="previous-file-selector">Previous XER: </label>
                         <input type="file" name="previous" id="previous-file-selector" accept=".xer" required>
-                        <select name="previous" id="previous-project-selector">
+                        <select name="previous" id="previous-project-selector" class="f14">
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
-                    <button id="compare" class="btn margin-t-20-h-auto txt-center">Compare</button>
+                    <button id="compare" class="btn margin-t-20-h-auto txt-center f14 pad-1em">Compare</button>
                 </div>
             </section>
             <section id="project" class="cat">
                 <h2 class="hidden">Projects</h2>
-                <div class="card pad-1em project-names">
-                    <div class="pad-bm-1em proj">
+                <div class="pad-1em project-names">
+                    <div class="card pad-1em proj">
                         <h3 class="pad-bm-05em txt-center">Current Project</h3>
                         <table class="f13">
                             <tr>
@@ -58,7 +58,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="proj">
+                    <div class="card pad-1em proj">
                         <h3 class="pad-bm-05em txt-center">Previous Project</h3>
                         <table class="f13">
                             <tr>
@@ -183,17 +183,21 @@
                 <h2 class="hidden">Changes</h2>
                 <div id="yes-changes"></div>
                 <h2 class="hidden">No Changes</h2>
-                <div id="no-changes"></div>
+                <div>
+                <div id="no-changes" class="card margin-v-20 pad-1em"></div>
+                </div>
             </section>
             <section id="updates" class="hidden cat">
                 <h2 class="hidden">Updates</h2>
                 <div id="yes-updates"></div>
                 <h2 class="hidden">No Updates</h2>
-                <div id="no-updates"></div>
+                <div>
+                <div id="no-updates" class="card margin-v-20 pad-1em"></div>
+                </div>
             </section>
             <section id="critical" class="hidden cat">
                 <h2 class="hidden">Critical Path</h2>
-                <div class="card pad-1em" id="current-critical">
+                <div class="card pad-1em margin-v-20" id="current-critical">
                     <h3 class="pad-bm-05em txt-center">Critical Path Comparison</h3>
                 </div>
             </section>

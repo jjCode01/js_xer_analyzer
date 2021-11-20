@@ -31,6 +31,11 @@ function updateProjCard(el){
     document.getElementById(`${el.name}-actual-cost`).innerHTML = formatCost(actualCost(proj))
     document.getElementById(`${el.name}-this-period`).innerHTML = formatCost(thisPeriodCost(proj))
     document.getElementById(`${el.name}-remaining-cost`).innerHTML = formatCost(remainingCost(proj))
+
+    document.getElementById(`${el.name}-tasks`).innerHTML = proj.tasks.size
+    document.getElementById(`${el.name}-not-started`).innerHTML = [...proj.tasks.values()].filter(task => task.notStarted).length
+    document.getElementById(`${el.name}-in-progress`).innerHTML = [...proj.tasks.values()].filter(task => task.inProgress).length
+    document.getElementById(`${el.name}-complete`).innerHTML = [...proj.tasks.values()].filter(task => task.completed).length
 }
 
 function updateProjList(projects, selector) {
@@ -51,7 +56,7 @@ for (let i = 0; i < fileSelectors.length; i++) {
         let reader = new FileReader();
         let projSelector = document.getElementById(`${e.target.name}-project-selector`);
         reader.onload = (r) => {
-            tables[e.target.name] = parseFile(r.target.result);
+            tables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
             updateProjList(tables[e.target.name]['PROJECT'], projSelector);
         };
         reader.readAsText(e.target.files[0], "cp1252");
@@ -86,11 +91,11 @@ const createCard = change => {
     const div = document.createElement("div")
     const title = document.createElement("h3")
     if (change.rows.length) {
-        div.classList.add("card", "pad-1em", "border-rad-5", "box-shadow", "margin-10", "margin-v-20")
+        div.classList.add("card", "pad-1em", "border-rad-5", "margin-10", "margin-v-20")
         title.classList.add("f14", "collapsible", "cursor-pointer")
     }
     else {
-        div.classList.add("card", "pad-h-1em", "margin-10", "f-reg")
+        div.classList.add("pad-h-1em", "margin-10", "f-reg")
         title.classList.add("f14", "f-reg")
     }
 
@@ -166,6 +171,8 @@ document.getElementById('compare').addEventListener("click", () => {
         let remainingVar = remainingCost(projects.current) - remainingCost(projects.previous)
         document.getElementById("remaining-cost-var").innerHTML = formatCost(remainingVar)
 
+        
+
         if (projects.current.plan_end_date && projects.previous.plan_end_date) {
             let mfbVar = projects.current.plan_end_date.getTime() - projects.previous.plan_end_date.getTime()
             mfbVar = mfbVar / (1000 * 3600 * 24)
@@ -212,6 +219,7 @@ document.getElementById('compare').addEventListener("click", () => {
 
         const coll = document.getElementsByClassName("collapsible");
 
+        // Make tables collapsible
         for (let i = 0; i < coll.length; i++) {
             coll[i].addEventListener("click", function() {
                 const content = this.nextElementSibling;
