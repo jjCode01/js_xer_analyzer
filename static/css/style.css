@@ -16,9 +16,7 @@ html{
     font-family: Helvetica, sans-serif;
 }
 
-ul {
-    list-style-type: none;
-}
+ul {list-style-type: none;}
 
 .btn {
     cursor: pointer;
@@ -197,6 +195,8 @@ th{
 }
 
 .border-rad-5{border-radius: 5px;}
+
+.width-10em{width: 5em;}
 
 /* .box-shadow{
     box-shadow: 0 0 10px 2px rgba(119, 136, 153, 0.25);

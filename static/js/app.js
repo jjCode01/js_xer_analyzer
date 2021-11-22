@@ -14,43 +14,44 @@ let tables = {
 
 let projects = {}
 
-function updateProjCard(el){
-    let proj = tables[el.name]["PROJECT"][el.value]
-    projects[el.name] = proj
-    document.getElementById(`${el.name}-project-id`).innerHTML = proj['proj_short_name']
-    document.getElementById(`${el.name}-project-name`).innerHTML = proj['proj_long_name']
+function updateProjCard(name, value){
+    let proj = tables[name].PROJECT[value]
+    projects[name] = proj
+    document.getElementById(`${name}-project-id`).innerHTML = proj['proj_short_name']
+    document.getElementById(`${name}-project-name`).innerHTML = proj['proj_long_name']
     
-    document.getElementById(`${el.name}-start`).innerHTML = formatDate(proj['plan_start_date'])
-    document.getElementById(`${el.name}-data-date`).innerHTML = formatDate(proj['last_recalc_date'])
-    document.getElementById(`${el.name}-end`).innerHTML = formatDate(proj['scd_end_date'])
+    document.getElementById(`${name}-start`).innerHTML = formatDate(proj['plan_start_date'])
+    document.getElementById(`${name}-data-date`).innerHTML = formatDate(proj['last_recalc_date'])
+    document.getElementById(`${name}-end`).innerHTML = formatDate(proj['scd_end_date'])
 
-    if (proj.plan_end_date){document.getElementById(`${el.name}-mfb`).innerHTML = formatDate(proj['plan_end_date'])}
-    else {document.getElementById(`${el.name}-mfb`).innerHTML = "None"}
+    if (proj.plan_end_date){document.getElementById(`${name}-mfb`).innerHTML = formatDate(proj['plan_end_date'])}
+    else {document.getElementById(`${name}-mfb`).innerHTML = "None"}
 
-    document.getElementById(`${el.name}-budget`).innerHTML = formatCost(budgetedCost(proj))
-    document.getElementById(`${el.name}-actual-cost`).innerHTML = formatCost(actualCost(proj))
-    document.getElementById(`${el.name}-this-period`).innerHTML = formatCost(thisPeriodCost(proj))
-    document.getElementById(`${el.name}-remaining-cost`).innerHTML = formatCost(remainingCost(proj))
+    document.getElementById(`${name}-budget`).innerHTML = formatCost(budgetedCost(proj))
+    document.getElementById(`${name}-actual-cost`).innerHTML = formatCost(actualCost(proj))
+    document.getElementById(`${name}-this-period`).innerHTML = formatCost(thisPeriodCost(proj))
+    document.getElementById(`${name}-remaining-cost`).innerHTML = formatCost(remainingCost(proj))
 
-    document.getElementById(`${el.name}-tasks`).innerHTML = proj.tasks.size
-    document.getElementById(`${el.name}-not-started`).innerHTML = [...proj.tasks.values()].filter(task => task.notStarted).length
-    document.getElementById(`${el.name}-in-progress`).innerHTML = [...proj.tasks.values()].filter(task => task.inProgress).length
-    document.getElementById(`${el.name}-complete`).innerHTML = [...proj.tasks.values()].filter(task => task.completed).length
+    document.getElementById(`${name}-tasks`).innerHTML = proj.tasks.size
+    document.getElementById(`${name}-not-started`).innerHTML = [...proj.tasks.values()].filter(task => task.notStarted).length
+    document.getElementById(`${name}-in-progress`).innerHTML = [...proj.tasks.values()].filter(task => task.inProgress).length
+    document.getElementById(`${name}-complete`).innerHTML = [...proj.tasks.values()].filter(task => task.completed).length
 }
 
 function updateProjList(projects, selector) {
     for (let i = selector.options.length - 1; i >= 0; i--) {selector.remove(i);}
-    for (const proj in projects){
-        let p = projects[proj]
+    for (const proj in projects) {
+        // let p = projects[proj]
         let el = document.createElement("option")
-        el.textContent = `${p['proj_short_name']} - ${p['proj_long_name']}`
-        el.value = p['proj_id']
+        el.textContent = `${projects[proj].proj_short_name} - ${projects[proj].proj_long_name}`
+        el.value = projects[proj].proj_id
         selector.appendChild(el)
     }
-    updateProjCard(selector)
+    updateProjCard(selector.name, selector.value)
 }
 
 let fileSelectors = document.getElementsByTagName("input");
+
 for (let i = 0; i < fileSelectors.length; i++) {
     fileSelectors[i].addEventListener("change", (e) => {
         let reader = new FileReader();
@@ -119,20 +120,6 @@ const createCard = change => {
     return div
 }
 
-function clickHandle(evt, id) {
-    let x, tablinks;
-    x = document.getElementsByClassName("cat");
-    for (let i = 0; i < x.length; i++) {
-      x[i].style.display = "none";
-    }
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < x.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active-btn", "");
-    }
-    document.getElementById(id).style.display = "flex";
-    evt.currentTarget.classList.add("active-btn");
-}
-
 document.getElementById('compare').addEventListener("click", () => {
     if (projects.current && projects.previous) {
         document.getElementById("upload").classList.add("hidden")
@@ -171,7 +158,20 @@ document.getElementById('compare').addEventListener("click", () => {
         let remainingVar = remainingCost(projects.current) - remainingCost(projects.previous)
         document.getElementById("remaining-cost-var").innerHTML = formatCost(remainingVar)
 
-        
+        let actCntVar = projects.current.tasks.size - projects.previous.tasks.size
+        document.getElementById("tasks-var").innerHTML = actCntVar
+
+        let currNotStarted = [...projects.current.tasks.values()].filter(task => task.notStarted).length
+        let prevNotStarted = [...projects.previous.tasks.values()].filter(task => task.notStarted).length
+        document.getElementById("not-started-var").innerHTML = currNotStarted - prevNotStarted
+
+        let currInProgress = [...projects.current.tasks.values()].filter(task => task.inProgress).length
+        let prevInProgress = [...projects.previous.tasks.values()].filter(task => task.inProgress).length
+        document.getElementById("in-progress-var").innerHTML = currInProgress - prevInProgress
+
+        let currCompleted = [...projects.current.tasks.values()].filter(task => task.completed).length       
+        let prevCompleted = [...projects.previous.tasks.values()].filter(task => task.completed).length
+        document.getElementById("complete-var").innerHTML = currCompleted - prevCompleted        
 
         if (projects.current.plan_end_date && projects.previous.plan_end_date) {
             let mfbVar = projects.current.plan_end_date.getTime() - projects.previous.plan_end_date.getTime()

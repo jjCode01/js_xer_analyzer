@@ -18,12 +18,26 @@
                 <li id="updates-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'updates')">Updates</li>
                 <li id="critical-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'critical')">Critical Path</li>
             </ul>
+            <script>
+                function clickHandle(evt, id) {
+                    let x = document.getElementsByClassName("cat");
+                    for (let i = 0; i < x.length; i++) {
+                        x[i].style.display = "none";
+                    }
+                    let tablinks = document.getElementsByClassName("tablinks");
+                    for (i = 0; i < x.length; i++) {
+                        tablinks[i].className = tablinks[i].className.replace(" active-btn", "");
+                    }
+                    document.getElementById(id).style.display = "flex";
+                    evt.currentTarget.classList.add("active-btn");
+                }
+            </script>
         </aside>
 
         <div class="content">
             <section id="upload">
                 <h2 class="hidden">File Upload</h2>
-                <div class="card pad-1em margin-20 upload">
+                <div class="card pad-1em margin-20 upload width-10em">
                     <h3 class="pad-bm-05em">File Upload</h3>
                     <div class="upload-wrap grid pad-bm-1em">
                         <label for="current-file-selector">Current XER: </label>
@@ -39,6 +53,9 @@
                             <option value="">--Please choose a project--</option>
                         </select>
                     </div>
+                    <script>
+                        
+                    </script>
                     <button id="compare" class="btn margin-t-20-h-auto txt-center f14 pad-1em">Compare</button>
                 </div>
             </section>
@@ -173,7 +190,7 @@
                             <td>Complete:</td>
                             <td id="current-complete" class="txt-right"></td>
                             <td id="previous-complete" class="txt-right"></td>
-                            <td id="remaining-complete" class="txt-right"></td>
+                            <td id="complete-var" class="txt-right"></td>
                         </tr>
                     </table>
                 </div>
