@@ -24,7 +24,11 @@ const formatDate = dt => {
     return dt.getDate() + "-" + M[dt.getMonth()] + "-" + dt.getFullYear()
 }
 
-const dateVarianceDays = (date1, date2) => ((date1.getDate() - date2.getDate())) // / (1000 * 3600 *24)).toFixed(0)
+const dateVarianceDays = (date1, date2) => {
+    
+    // console.log(`Prev: ${date1.getDate()}  Curr: ${date2.getDate()}  Var: ${date1.getDate() - date2.getDate()}`)
+    return ((date1.getTime() - date2.getTime()) / (1000 * 3600 *24)).toFixed(0)
+}
 
 const formatCost = cost => {
     return cost.toLocaleString('en-US', {

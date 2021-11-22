@@ -47,17 +47,18 @@ const parseCriticalPath = (proj1, proj2) => {
             addTableRow(table, vals)
         } else if (!proj2.tasksByCode.get(task.task_code).completed) {
             const prev = proj2.tasksByCode.get(task.task_code)
+            const curr = proj1.tasksByCode.get(task.task_code)
 
-            const startVar = dateVarianceDays(prev.start, task.start)
-            const finishVar = dateVarianceDays(prev.finish, task.finish)
+            const startVar = dateVarianceDays(prev.start, curr.start)
+            const finishVar = dateVarianceDays(prev.finish, curr.finish)
 
             const isCurrCP = currentCP.has(task.task_code) ? '&#10003;' : ""
             const isPrevCP = previousCP.has(task.task_code) ? '&#10003;' : ""
 
             vals = [
                 [task.task_code, ""], [task.task_name, ""], [task.status, ""],
-                [formatDate(prev.start), ""], [formatDate(task.start), ""], [startVar, "txt-center"],
-                [formatDate(prev.finish), ""], [formatDate(task.finish), ""], [finishVar, "txt-center"],
+                [formatDate(prev.start), ""], [formatDate(curr.start), ""], [startVar, "txt-center"],
+                [formatDate(prev.finish), ""], [formatDate(curr.finish), ""], [finishVar, "txt-center"],
                 [isCurrCP, "txt-center"], [isPrevCP, "txt-center"]
             ]
             addTableRow(table, vals)
