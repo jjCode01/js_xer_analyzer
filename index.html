@@ -1,231 +1,631 @@
+<!-- 
+Analyze Calendar Exceptions
+DONE -- Activity WBS Changes
+WBS Changes
+DONE -- Activity in progress but rem duration zero
+DONE -- Activity in progress but activity % complete is 0
+Duplicate Relationships
+Redundant Logic
+Lags/Leads
+DONE -- Budgeted Cost != At Completion Cost
+DONE -- Earned Value != Actual Cost
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title id="title">XER Analyzer</title>
     <link rel="stylesheet" type="text/css" href="./static/css/style.css">
 </head>
-
 <body>
-    <div class="container">
-        <aside class="menu">
-            <header class="f14"><h1 class="txt-center">XER Analyzer</h1></header>
+    <aside id="menu" class="menu hidden">
+        <div class="card border-rad-8px box-shadow">
+            <header><h1 class="">XER Analyzer</h1></header>
             <ul>
-                <li id="projects-btn" class="tablinks btn margin-t-15 active-btn" onclick="clickHandle(event, 'project')">Projects</li>
-                <li id="changes-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'changes')">Changes</li>
-                <li id="updates-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'updates')">Updates</li>
-                <li id="critical-btn" class="hidden tablinks btn margin-t-15" onclick="clickHandle(event, 'critical')">Critical Path</li>
-            </ul>
-            <script>
-                function clickHandle(evt, id) {
-                    let x = document.getElementsByClassName("cat");
-                    for (let i = 0; i < x.length; i++) {
-                        x[i].style.display = "none";
-                    }
-                    let tablinks = document.getElementsByClassName("tablinks");
-                    for (i = 0; i < x.length; i++) {
-                        tablinks[i].className = tablinks[i].className.replace(" active-btn", "");
-                    }
-                    document.getElementById(id).style.display = "flex";
-                    evt.currentTarget.classList.add("active-btn");
-                }
-            </script>
-        </aside>
+                <li><div id="dashboard-btn" onclick="menuClickHandle(event, 'general')" class="btn border-top show-data">Dashboard</div></li>
+                <li class="hidden base"><div class="btn exp collapsible border-top">Progress Changes<span id="ud" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="ud-started-btn" class="sub btn inactive-btn">Started:<span id="ud-started" class="float-right"></span></div></li>
+                            <li><div id="ud-finished-btn" class="sub btn inactive-btn">Finished:<span id="ud-finished" class="float-right"></span></div></li>
+                            <li><div id="ud-percent-btn" class="sub btn inactive-btn">Percent Complete:<span id="ud-percent" class="float-right"></span></div></li>
+                            <li><div id="ud-duration-btn" class="sub btn inactive-btn">Remaining Duration:<span id="ud-duration" class="float-right"></span></div></li>
+                            <li><div id="ud-cost-btn" class="sub btn inactive-btn">Actual Cost:<span id="ud-cost" class="float-right"></span></div></li>
+                            <li><div id="ud-regress-btn" class="sub btn inactive-btn">Regressive:<span id="ud-regress" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="hidden base"><div class="btn exp collapsible border-top">Activity Revisions<span id="tk" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="tk-added-btn" class="sub btn inactive-btn">Added:<span id="tk-added" class="float-right"></span></div></li>
+                            <li><div id="tk-deleted-btn" class="sub btn inactive-btn">Deleted:<span id="tk-deleted" class="float-right"></span></div></li>
+                            <li><div id="tk-name-btn" class="sub btn inactive-btn">Names:<span id="tk-name" class="float-right"></span></div></li>
+                            <li><div id="tk-duration-btn" class="sub btn inactive-btn">Orig Durations:<span id="tk-duration" class="float-right"></span></div></li>
+                            <li><div id="tk-calendar-btn" class="sub btn inactive-btn">Calendars:<span id="tk-calendar" class="float-right"></span></div></li>
+                            <li><div id="tk-start-btn" class="sub btn inactive-btn">Actual Starts:<span id="tk-start" class="float-right"></span></div></li>
+                            <li><div id="tk-finish-btn" class="sub btn inactive-btn">Actual Finishes:<span id="tk-finish" class="float-right"></span></div></li>
+                            <li><div id="tk-wbs-btn" class="sub btn inactive-btn">WBS Asignment:<span id="tk-wbs" class="float-right"></span></div></li>
 
-        <div class="content">
-            <section id="upload">
-                <h2 class="hidden">File Upload</h2>
-                <div class="card pad-1em margin-20 upload width-10em">
-                    <h3 class="pad-bm-05em">File Upload</h3>
-                    <div class="upload-wrap grid pad-bm-1em">
-                        <label for="current-file-selector">Current XER: </label>
-                        <input type="file" name="current" id="current-file-selector" accept=".xer" required>
-                        <select name="current" id="current-project-selector" class="f14">
-                            <option value="">--Please choose a project--</option>
+                        </ul>
+                    </div>
+                </li>
+                <li class="hidden base"><div class="btn exp collapsible border-top">Relationship Revisions<span id="rl" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="rl-added-btn" class="sub btn inactive-btn">Added:<span id="rl-added" class="float-right"></span></div></li>
+                            <li><div id="rl-deleted-btn" class="sub btn inactive-btn">Deleted:<span id="rl-deleted" class="float-right"></span></div></li>
+                            <li><div id="rl-revised-btn" class="sub btn inactive-btn">Revised:<span id="rl-revised" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="hidden base"><div class="btn exp collapsible border-top">Resource Revisions<span id="rs" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="rs-added-btn" class="sub btn inactive-btn">Added:<span id="rs-added" class="float-right"></span></div></li>
+                            <li><div id="rs-deleted-btn" class="sub btn inactive-btn">Deleted:<span id="rs-deleted" class="float-right"></span></div></li>
+                            <li><div id="rs-cost-btn" class="sub btn inactive-btn">Revised Cost:<span id="rs-cost" class="float-right"></span></div></li>
+                            <li><div id="rs-units-btn" class="sub btn inactive-btn">Revised Units:<span id="rs-units" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="hidden base"><div class="btn exp collapsible border-top">Constraint Revisions<span id="cs" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="cs-added-prim-btn" class="sub btn inactive-btn">Added Primary:<span id="cs-added-prim" class="float-right"></span></div></li>
+                            <li><div id="cs-deleted-prim-btn" class="sub btn inactive-btn">Deleted Primary:<span id="cs-deleted-prim" class="float-right"></span></div></li>
+                            <li><div id="cs-revised-prim-btn" class="sub btn inactive-btn">Revised Primary:<span id="cs-revised-prim" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><div class="btn exp collapsible border-top">Open Ends<span id="open" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="open-pred-btn" class="sub btn inactive-btn">Open Predecessors:<span id="open-pred" class="float-right"></span></div></li>
+                            <li><div id="open-succ-btn" class="sub btn inactive-btn">Open Successors:<span id="open-succ" class="float-right"></span></div></li>
+                            <li><div id="open-start-btn" class="sub btn inactive-btn">Open Starts:<span id="open-start" class="float-right"></span></div></li>
+                            <li><div id="open-finish-btn" class="sub btn inactive-btn">Open Finishes:<span id="open-finish" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li><div class="btn exp collapsible">Date Warnings<span id="inv" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="inv-start-btn" class="sub btn inactive-btn">Actual Start >= Data Date:<span id="inv-start" class="float-right"></span></div></li>
+                            <li><div id="inv-finish-btn" class="sub btn inactive-btn">Actual Finish >= Data Date:<span id="inv-finish" class="float-right"></span></div></li>
+                            <li><div id="inv-startDD-btn" class="sub btn inactive-btn">Start Riding Data Date:<span id="inv-startDD" class="float-right"></span></div></li>
+                            <li><div id="inv-finishDD-btn" class="sub btn inactive-btn">Finish Riding Data Date:<span id="inv-finishDD" class="float-right"></span></div></li>
+                            <li><div id="inv-expected-btn" class="sub btn inactive-btn">Expected Finish:<span id="inv-expected" class="float-right"></span></div></li>
+                            <li><div id="inv-suspend-btn" class="sub btn inactive-btn">Suspend / Resume:<span id="inv-suspend" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><div class="btn exp collapsible">Duration Warnings<span id="dur" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="dur-long-btn" class="sub btn inactive-btn">Orig Dur > 20:<span id="dur-long" class="float-right"></span></div></li>
+                            <li><div id="dur-zero-btn" class="sub btn inactive-btn">Orig Dur = 0:<span id="dur-zero" class="float-right"></span></div></li>
+                            <li><div id="dur-short-btn" class="sub btn inactive-btn">Orig Dur = 1:<span id="dur-short" class="float-right"></span></div></li>
+                            <li><div id="dur-rdzero-btn" class="sub btn inactive-btn">Rem Dur = 0:<span id="dur-rdzero" class="float-right"></span></div></li>
+                            <li><div id="dur-odrd-btn" class="sub btn inactive-btn">Rem Dur != Orig Dur:<span id="dur-odrd" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><div class="btn exp collapsible">Cost Warnings<span id="cost" class="float-right"></span></div>
+                    <div style="display: none;">
+                        <ul>
+                            <li><div id="cost-budget-btn" class="sub btn inactive-btn">Cost Variance:<span id="cost-budget" class="float-right"></span></div></li>
+                            <li><div id="cost-ev-btn" class="sub btn inactive-btn">Earned Value Variance:<span id="cost-ev" class="float-right"></span></div></li>
+                            <li><div id="cost-regress-btn" class="sub btn inactive-btn">Regressive Billing:<span id="cost-regress" class="float-right"></span></div></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><div id="critical-btn" class="btn border-top">Critical Path</div></li>
+            </ul>
+        </div>
+    </aside>
+    <div id="content">
+        <section id="upload" class="cat max-width-960">
+            <div>
+                <h2 class="width-100">Select XER Files</h2>
+                <div class="card border-rad-8px box-shadow min-wid-330 margin-top-20px">
+                    <div class="">
+                        <label for="current-file-selector" class="block">Current XER</label>
+                    </div>
+                    <div class="pad-10px">
+                        <input type="file" name="current" id="current-file-selector" accept=".xer" class="xer margin-top-5px" required>
+                        <select name="current" id="current-project-selector" class="block width-100 margin-top-10px hidden">
                         </select>
                     </div>
-                    <div class="upload-wrap grid">
-                        <label for="previous-file-selector">Previous XER: </label>
-                        <input type="file" name="previous" id="previous-file-selector" accept=".xer" required>
-                        <select name="previous" id="previous-project-selector" class="f14">
-                            <option value="">--Please choose a project--</option>
-                        </select>
-                    </div>
-                    <script>
-                        
-                    </script>
-                    <button id="compare" class="btn margin-t-20-h-auto txt-center f14 pad-1em">Compare</button>
                 </div>
-            </section>
-            <section id="project" class="cat">
-                <h2 class="hidden">Projects</h2>
-                <div class="pad-1em project-names">
-                    <div class="card pad-1em proj">
-                        <h3 class="pad-bm-05em txt-center">Current Project</h3>
-                        <table class="f13">
+                <!-- <label for="compare-checkbox"> -->
+                    <input type="checkbox" id="compare-checkbox" name="accept" value="no" class="margin-top-20px margin-hor">  Include Comparison to Basline / Previous Update 
+                 <!-- </label> -->
+                <div class="card border-rad-8px box-shadow min-wid-330 margin-top-20px hidden base">
+                    <div class="">
+                        <label for="previous-file-selector" class="block">Previous XER</label>
+                    </div>
+                    <div class="pad-10px">
+                        <input type="file" name="previous" id="previous-file-selector" accept=".xer" class="xer margin-top-5px" required>
+                        <select name="previous" id="previous-project-selector" class="block width-100 margin-top-10px hidden">
+                        </select>
+                    </div>
+                </div>
+                <div class="width-100 margin-top-20px margin-hor">
+                    <button id="analyze-btn" disabled=true>Analyze</button>
+                </div>
+            </div>
+            <script>
+                
+            </script>
+        </section>
+        <section id="general" class="cat hidden">
+            <div class="flex">
+                <h2 class="hidden width-100 text-center">General Project Information</h2>
+                <div class="card border-rad-8px box-shadow width-100">
+                    <div class="">
+                        <h3 class="pad-bm-05em">Current Project</h3>
+                    </div>
+                    <div class="pad-10px">
+                        <table>
                             <tr>
-                                <td>Project ID:</td>
+                                <td class="no-wrap">Project ID:</td>
                                 <td id="current-project-id"></td>
                             </tr>
                             <tr>
-                                <td>Project Name:</td>
-                                <td id="current-project-name"></td>
+                                <td class="no-wrap">Project Name:</td>
+                                <td class="width-max" id="current-project-name"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">P6 Version:</td>
+                                <td class="width-max" id="current-project-version"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">XER Created On:</td>
+                                <td class="width-max" id="current-project-created"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">XER Created By:</td>
+                                <td class="width-max" id="current-project-user"></td>
                             </tr>
                         </table>
                     </div>
-                    <div class="card pad-1em proj">
-                        <h3 class="pad-bm-05em txt-center">Previous Project</h3>
-                        <table class="f13">
+                </div>
+                <div class="card border-rad-8px box-shadow width-100 hidden base">
+                    <div class="">
+                        <h3 class="pad-bm-05em">Previous Project</h3>
+                    </div>
+                    <div class="pad-10px">
+                        <table>
                             <tr>
-                                <td>Project ID:</td>
+                                <td class="no-wrap">Project ID:</td>
                                 <td id="previous-project-id"></td>
                             </tr>
                             <tr>
-                                <td>Project Name:</td>
-                                <td id="previous-project-name"></td>
+                                <td class="no-wrap">Project Name:</td>
+                                <td class="width-max" id="previous-project-name"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">P6 Version:</td>
+                                <td class="width-max" id="previous-project-version"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">XER Created On:</td>
+                                <td class="width-max" id="previous-project-created"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">XER Created By:</td>
+                                <td class="width-max" id="previous-project-user"></td>
                             </tr>
                         </table>
                     </div>
                 </div>
-                <div class="card pad-1em info">
-                    <h3 class="pad-bm-05em txt-center">Schedule Dates</h3>
-                    <table>
-                        <tr>
-                            <th>Date</th>
-                            <th class="txt-center">Curr</th>
-                            <th class="txt-center">Prev</th>
-                            <th class="txt-right">Var</th>
-                        </tr>
-                        <tr>
-                            <td>Start Date:</td>
-                            <td id="current-start" class="txt-center"></td>
-                            <td id="previous-start" class="txt-center"></td>
-                            <td id="start-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>Data Date:</td>
-                            <td id="current-data-date" class="txt-center"></td>
-                            <td id="previous-data-date" class="txt-center"></td>
-                            <td id="dd-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>End Date:</td>
-                            <td id="current-end" class="txt-center"></td>
-                            <td id="previous-end" class="txt-center"></td>
-                            <td id="end-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>Must Finish By:</td>
-                            <td id="current-mfb" class="txt-center"></td>
-                            <td id="previous-mfb" class="txt-center"></td>
-                            <td id="mfb-var" class="txt-right"></td>
-                        </tr>
-                    </table>
+                <div class="flex">
+                <div class="card border-rad-8px box-shadow stretch3">
+                    <div class="">
+                        <h3 class="pad-bm-05em txt-center">Project Dates</h3>
+                    </div>
+                    <div class="pad-10px">
+                        <table>
+                            <tr>
+                                <th class="text-left">Date</th>
+                                <th class="width-8em">Current</th>
+                                <th class="width-8em hidden base">Previous</th>
+                                <th class="text-right hidden base">Diff</th>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">Start Date:</td>
+                                <td id="current-start" class="text-center no-wrap"></td>
+                                <td id="previous-start" class="text-center no-wrap hidden base"></td>
+                                <td id="start-var" class="text-right no-wrap hidden base"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">Data Date:</td>
+                                <td id="current-data-date" class="text-center no-wrap"></td>
+                                <td id="previous-data-date" class="text-center no-wrap hidden base"></td>
+                                <td id="dd-var" class="text-right no-wrap hidden base"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">End Date:</td>
+                                <td id="current-end" class="text-center no-wrap"></td>
+                                <td id="previous-end" class="text-center no-wrap hidden base"></td>
+                                <td id="end-var" class="text-right no-wrap hidden base"></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">Must Finish:</td>
+                                <td id="current-mfb" class="text-center no-wrap"></td>
+                                <td id="previous-mfb" class="text-center no-wrap hidden base"></td>
+                                <td id="mfb-var" class="text-right no-wrap hidden base"></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
-                <div class="card pad-1em info">
-                    <h3 class="pad-bm-05em txt-center">Cost Loading</h3>
-                    <table>
-                        <tr>
-                            <th>Cost</th>
-                            <th class="txt-center">Curr</th>
-                            <th class="txt-center">Prev</th>
-                            <th class="txt-center">Var</th>
-                        </tr>
-                        <tr>
-                            <td>Budgeted Cost:</td>
-                            <td id="current-budget" class="txt-right"></td>
-                            <td id="previous-budget" class="txt-right"></td>
-                            <td id="budget-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>Cost To Date:</td>
-                            <td id="current-actual-cost" class="txt-right"></td>
-                            <td id="previous-actual-cost" class="txt-right"></td>
-                            <td id="actual-cost-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>This Period:</td>
-                            <td id="current-this-period" class="txt-right"></td>
-                            <td id="previous-this-period" class="txt-right"></td>
-                            <td id="this-period-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>Remaining Cost:</td>
-                            <td id="current-remaining-cost" class="txt-right"></td>
-                            <td id="previous-remaining-cost" class="txt-right"></td>
-                            <td id="remaining-cost-var" class="txt-right"></td>
-                        </tr>
-                    </table>
+                <div class="card stretch border-rad-8px box-shadow">
+                    <div class="">
+                        <h3 class="pad-bm-05em">Progress</h3>
+                    </div>
+                    <div class="pad-10px">
+                        <table>
+                            <tr>
+                                <th class="text-left">Progress:</th>
+                                <th class="text-right width-8em">Current</th>
+                                <th class="text-right width-8em hidden base">Previous</th>
+                                <th class="text-right width-8em hidden base">Diff</th>
+                                <th class="no-wrap"></th>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">Schedule:</td>
+                                <td id="current-schedule-per" class="text-right no-wrap"></td>
+                                <td id="previous-schedule-per" class="text-right no-wrap hidden base"></td>
+                                <td id="schedule-per-var" class="text-right no-wrap hidden base"></td>
+                                <td class="outer-progress"><div id="sched-progress" class="inner-progress"></div></td>
+                            </tr>
+                            <!-- <tr>
+                                <td class="no-wrap">Contract Duration:</td>
+                                <td id="current-contract-per" class="text-right no-wrap"></td>
+                                <td id="previous-contract-per" class="text-right no-wrap"></td>
+                                <td id="contract-per-var" class="text-right no-wrap"></td>
+                            </tr> -->
+                            <tr>
+                                <td class="no-wrap">Physical:</td>
+                                <td id="current-physical-per" class="text-right no-wrap"></td>
+                                <td id="previous-physical-per" class="text-right no-wrap hidden base"></td>
+                                <td id="physical-per-var" class="text-right no-wrap hidden base"></td>
+                                <td class="outer-progress"><div id="phys-progress" class="inner-progress"></div></td>
+                            </tr>
+                            <tr>
+                                <td class="no-wrap">Cost:</td>
+                                <td id="current-cost-per" class="text-right no-wrap"></td>
+                                <td id="previous-cost-per" class="text-right no-wrap hidden base"></td>
+                                <td id="cost-per-var" class="text-right no-wrap hidden base"></td>
+                                <td class="outer-progress"><div id="cost-progress" class="inner-progress"></div></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
-                <div class="card pad-1em info">
-                    <h3 class="pad-bm-05em txt-center">Activity Counts</h3>
-                    <table>
-                        <tr>
-                            <th>Count</th>
-                            <th class="txt-center">Curr</th>
-                            <th class="txt-center">Prev</th>
-                            <th class="txt-center">Var</th>
-                        </tr>
-                        <tr>
-                            <td>Activities:</td>
-                            <td id="current-tasks" class="txt-right"></td>
-                            <td id="previous-tasks" class="txt-right"></td>
-                            <td id="tasks-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>Not Started:</td>
-                            <td id="current-not-started" class="txt-right"></td>
-                            <td id="previous-not-started" class="txt-right"></td>
-                            <td id="not-started-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>In Progress:</td>
-                            <td id="current-in-progress" class="txt-right"></td>
-                            <td id="previous-in-progress" class="txt-right"></td>
-                            <td id="in-progress-var" class="txt-right"></td>
-                        </tr>
-                        <tr>
-                            <td>Complete:</td>
-                            <td id="current-complete" class="txt-right"></td>
-                            <td id="previous-complete" class="txt-right"></td>
-                            <td id="complete-var" class="txt-right"></td>
-                        </tr>
-                    </table>
+                <div class="card border-rad-8px box-shadow">
+                    <div class="">
+                        <h3 class="pad-bm-05em">Activity / Relationship Stats</h3>
+                    </div>
+                    
+                    <div class="pad-10px flex">
+                        <div class="flex">
+                            <div class="stretch tbl-border min-wid-460">
+                                <table>
+                                    <tr>
+                                        <th class="text-left col-6-5em">Activity Status</th>
+                                        <th class="text-right col-5em">Count</th>
+                                        <th class="text-right col-3em">%</th>
+                                        <th class="text-right col-5em hidden base">Prev</th>
+                                        <th class="text-right col-3em hidden base">Diff</th>
+                                        <td class="chart no-wrap" rowspan="7"><canvas id="activityStatusChart"></canvas></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-red">Not Started:</td>
+                                        <td id="current-not-started" class="text-right no-wrap"></td>
+                                        <td id="current-not-started-per" class="text-right no-wrap"></td>
+                                        <td id="previous-not-started" class="text-right no-wrap hidden base"></td>
+                                        <td id="not-started-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-green">In Progress:</td>
+                                        <td id="current-in-progress" class="text-right no-wrap"></td>
+                                        <td id="current-in-progress-per" class="text-right no-wrap"></td>
+                                        <td id="previous-in-progress" class="text-right no-wrap hidden base"></td>
+                                        <td id="in-progress-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-blue">Completed:</td>
+                                        <td id="current-complete" class="text-right no-wrap"></td>
+                                        <td id="current-complete-per" class="text-right no-wrap"></td>
+                                        <td id="previous-complete" class="text-right no-wrap hidden base"></td>
+                                        <td id="complete-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap border-top">Total:</td>
+                                        <td id="current-tasks" class="text-right no-wrap border-top"></td>
+                                        <td class="text-right no-wrap border-top"></td>
+                                        <td id="previous-tasks" class="text-right no-wrap border-top hidden base"></td>
+                                        <td id="tasks-var" class="text-right no-wrap border-top hidden base"></td>
+                                    </tr>
+                                    <tr><td></td></tr>
+                                    <tr><td></td></tr>
+                                    
+                                </table>
+                            </div>
+                            <div class="stretch tbl-border min-wid-460">
+                                <table>
+                                    <tr>
+                                        <th class="text-left col-6-5em">Activity Type</th>
+                                        <th class="text-right col-5em">Count</th>
+                                        <th class="text-right col-3em">%</th>
+                                        <th class="text-right col-5em hidden base">Prev</th>
+                                        <th class="text-right col-3em hidden base">Diff</th>
+                                        <td class="chart no-wrap" rowspan="7"><canvas id="activityTypeChart"></canvas></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-red">Task:</td>
+                                        <td id="current-task-dependent" class="text-right no-wrap"></td>
+                                        <td id="current-task-dependent-per" class="text-right no-wrap"></td>
+                                        <td id="previous-task-dependent" class="text-right no-wrap hidden base"></td>
+                                        <td id="task-dependent-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-green">Milestone:</td>
+                                        <td id="current-milestones" class="text-right no-wrap"></td>
+                                        <td id="current-milestones-per" class="text-right no-wrap"></td>
+                                        <td id="previous-milestones" class="text-right no-wrap hidden base"></td>
+                                        <td id="milestones-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-blue">Level of Effort:</td>
+                                        <td id="current-loe" class="text-right no-wrap"></td>
+                                        <td id="current-loe-per" class="text-right no-wrap"></td>
+                                        <td id="previous-loe" class="text-right no-wrap hidden base"></td>
+                                        <td id="loe-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-yellow">Resource:</td>
+                                        <td id="current-rsrc-dependent" class="text-right no-wrap"></td>
+                                        <td id="current-rsrc-dependent-per" class="text-right no-wrap"></td>
+                                        <td id="previous-rsrc-dependent" class="text-right no-wrap hidden base"></td>
+                                        <td id="rsrc-dependent-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr><td></td></tr>
+                                    <tr><td></td></tr>
+                                </table>
+                            </div>
+                            <div class="stretch tbl-border min-wid-460">
+                                <table>
+                                    <tr>
+                                        <th class="text-left col-6-5em">Activity Float</th>
+                                        <th class="text-right col-5em">Count</th>
+                                        <th class="text-right col-3em">%</th>
+                                        <th class="text-right col-5em hidden base">Prev</th>
+                                        <th class="text-right col-3em hidden base">Diff</th>
+                                        <td class="chart no-wrap" rowspan="7"><canvas id="activityFloatChart"></canvas></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-red">Critical:</td>
+                                        <td id="current-critical" class="text-right no-wrap"></td>
+                                        <td id="current-critical-per" class="text-right no-wrap"></td>
+                                        <td id="previous-critical" class="text-right no-wrap hidden base"></td>
+                                        <td id="critical-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-yellow">Near Critical:</td>
+                                        <td id="current-near-critical" class="text-right no-wrap"></td>
+                                        <td id="current-near-critical-per" class="text-right no-wrap"></td>
+                                        <td id="previous-near-critical" class="text-right no-wrap hidden base"></td>
+                                        <td id="near-critical-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-green">Normal Float:</td>
+                                        <td id="current-normal-tf" class="text-right no-wrap"></td>
+                                        <td id="current-normal-tf-per" class="text-right no-wrap"></td>
+                                        <td id="previous-normal-tf" class="text-right no-wrap hidden base"></td>
+                                        <td id="normal-tf-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-blue">High Float:</td>
+                                        <td id="current-high-tf" class="text-right no-wrap"></td>
+                                        <td id="current-high-tf-per" class="text-right no-wrap"></td>
+                                        <td id="previous-high-tf" class="text-right no-wrap hidden base"></td>
+                                        <td id="high-tf-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">Longest Path:</td>
+                                        <td id="current-longest-path" class="text-right no-wrap"></td>
+                                        <td id="current-longest-path-per" class="text-right no-wrap"></td>
+                                        <td id="previous-longest-path" class="text-right no-wrap hidden base"></td>
+                                        <td id="longest-path-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr><td></td></tr>
+                                </table>
+                            </div>
+                            <div class="stretch tbl-border min-wid-460">
+                                <table>
+                                    <tr>
+                                        <th class="text-left col-6-5em">Relationships</th>
+                                        <th class="text-right col-5em">Count</th>
+                                        <th class="text-right col-3em">%</th>
+                                        <th class="text-right col-5em hidden base">Prev</th>
+                                        <th class="text-right col-3em hidden base">Diff</th>
+                                        <td class="chart" rowspan="7"><canvas id="relationshipChart"></canvas></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-green">Finish-Start:</td>
+                                        <td id="current-fs" class="text-right no-wrap"></td>
+                                        <td id="current-fs-per" class="text-right no-wrap"></td>
+                                        <td id="previous-fs" class="text-right no-wrap hidden base"></td>
+                                        <td id="fs-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-blue">Start-Start:</td>
+                                        <td id="current-ss" class="text-right no-wrap"></td>
+                                        <td id="current-ss-per" class="text-right no-wrap"></td>
+                                        <td id="previous-ss" class="text-right no-wrap hidden base"></td>
+                                        <td id="ss-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-yellow">Finish-Finish:</td>
+                                        <td id="current-ff" class="text-right no-wrap"></td>
+                                        <td id="current-ff-per" class="text-right no-wrap"></td>
+                                        <td id="previous-ff" class="text-right no-wrap hidden base"></td>
+                                        <td id="ff-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap chart-red">Start-Finish:</td>
+                                        <td id="current-sf" class="text-right no-wrap"></td>
+                                        <td id="current-sf-per" class="text-right no-wrap"></td>
+                                        <td id="previous-sf" class="text-right no-wrap hidden base"></td>
+                                        <td id="sf-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap border-top">Total:</td>
+                                        <td id="current-rels" class="text-right no-wrap border-top"></td>
+                                        <td class="text-right no-wrap border-top"></td>
+                                        <td id="previous-rels" class="text-right no-wrap border-top hidden base"></td>
+                                        <td id="rels-var" class="text-right no-wrap border-top hidden base"></td>
+                                    </tr>
+                                    <tr><td></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
-
-            <section id="changes" class="hidden cat">
-                <h2 class="hidden">Changes</h2>
-                <div id="yes-changes"></div>
-                <h2 class="hidden">No Changes</h2>
-                <div>
-                <div id="no-changes" class="card margin-v-20 pad-1em"></div>
+                
+                <div class="card stretch border-rad-8px box-shadow width-100">
+                    <div class="">
+                        <h3 class="pad-bm-05em">Cost / Resource Loading</h3>
+                    </div>
+                    <div class="pad-10px flex">
+                        <div class="flex">
+                            <div class="stretch tbl-border">
+                                <table>
+                                    <tr>
+                                        <th class="text-left">Cost</th>
+                                        <th class="text-right width-10em">Current</th>
+                                        <th class="text-right width-10em hidden base">Previous</th>
+                                        <th class="text-right width-10em hidden base">Diff</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">Budget:</td>
+                                        <td id="current-budget" class="text-right no-wrap"></td>
+                                        <td id="previous-budget" class="text-right no-wrap hidden base"></td>
+                                        <td id="budget-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">To Date:</td>
+                                        <td id="current-actual-cost" class="text-right no-wrap"></td>
+                                        <td id="previous-actual-cost" class="text-right no-wrap hidden base"></td>
+                                        <td id="actual-cost-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">This Period:</td>
+                                        <td id="current-this-period" class="text-right no-wrap"></td>
+                                        <td id="previous-this-period" class="text-right no-wrap hidden base"></td>
+                                        <td id="this-period-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">Remaining:</td>
+                                        <td id="current-remaining-cost" class="text-right no-wrap"></td>
+                                        <td id="previous-remaining-cost" class="text-right no-wrap hidden base"></td>
+                                        <td id="remaining-cost-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="stretch tbl-border">
+                                <table>
+                                    <tr>
+                                        <th class="text-left">Units</th>
+                                        <th class="text-right width-10em">Current</th>
+                                        <th class="text-right width-10em hidden base">Previous</th>
+                                        <th class="text-right width-10em hidden base">Diff</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">Budget:</td>
+                                        <td id="current-qty" class="text-right no-wrap"></td>
+                                        <td id="previous-qty" class="text-right no-wrap hidden base"></td>
+                                        <td id="qty-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">To Date:</td>
+                                        <td id="current-actual-qty" class="text-right no-wrap"></td>
+                                        <td id="previous-actual-qty" class="text-right no-wrap hidden base"></td>
+                                        <td id="actual-qty-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">This Period:</td>
+                                        <td id="current-this-period-qty" class="text-right no-wrap"></td>
+                                        <td id="previous-this-period-qty" class="text-right no-wrap hidden base"></td>
+                                        <td id="this-period-qty-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="no-wrap">Remaining:</td>
+                                        <td id="current-remaining-qty" class="text-right no-wrap"></td>
+                                        <td id="previous-remaining-qty" class="text-right no-wrap hidden base"></td>
+                                        <td id="remaining-qty-var" class="text-right no-wrap hidden base"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
-            <section id="updates" class="hidden cat">
-                <h2 class="hidden">Updates</h2>
-                <div id="yes-updates"></div>
-                <h2 class="hidden">No Updates</h2>
-                <div>
-                <div id="no-updates" class="card margin-v-20 pad-1em"></div>
                 </div>
-            </section>
-            <section id="critical" class="hidden cat">
-                <h2 class="hidden">Critical Path</h2>
-                <div class="card pad-1em margin-v-20" id="current-critical">
-                    <h3 class="pad-bm-05em txt-center">Critical Path Comparison</h3>
-                </div>
-            </section>
-        </div>
+            </div>
+            
+        </section>
+        <section id="display-table" class="hidden cat"></section>
+        <section id="ud-started-sec" class="hidden cat"></section>
+        <section id="ud-finished-sec" class="hidden cat"></section>
+        <section id="ud-percent-sec" class="hidden cat"></section>
+        <section id="ud-duration-sec" class="hidden cat"></section>
+        <section id="ud-cost-sec" class="hidden cat"></section>
+        <section id="ud-regress-sec" class="hidden cat"></section>
+        <section id="tk-added-sec" class="hidden cat"></section>
+        <section id="tk-deleted-sec" class="hidden cat"></section>
+        <section id="tk-name-sec" class="hidden cat"></section>
+        <section id="tk-duration-sec" class="hidden cat"></section>
+        <section id="tk-calendar-sec" class="hidden cat"></section>
+        <section id="tk-start-sec" class="hidden cat"></section>
+        <section id="tk-finish-sec" class="hidden cat"></section>
+        <section id="tk-wbs-sec" class="hidden cat"></section>
+        <section id="rl-added-sec" class="hidden cat"></section>
+        <section id="rl-deleted-sec" class="hidden cat"></section>
+        <section id="rl-revised-sec" class="hidden cat"></section>
+        <section id="rs-added-sec" class="hidden cat"></section>
+        <section id="rs-deleted-sec" class="hidden cat"></section>
+        <section id="rs-cost-sec" class="hidden cat"></section>
+        <section id="rs-units-sec" class="hidden cat"></section>
+        <section id="cs-added-prim-sec" class="hidden cat"></section>
+        <section id="cs-deleted-prim-sec" class="hidden cat"></section>
+        <section id="cs-revised-prim-sec" class="hidden cat"></section>
+        <section id="open-pred-sec" class="hidden cat"></section>
+        <section id="open-succ-sec" class="hidden cat"></section>
+        <section id="open-start-sec" class="hidden cat"></section>
+        <section id="open-finish-sec" class="hidden cat"></section>
+        <section id="inv-start-sec" class="hidden cat"></section>
+        <section id="inv-finish-sec" class="hidden cat"></section>
+        <section id="inv-expected-sec" class="hidden cat"></section>
+        <section id="inv-suspend-sec" class="hidden cat"></section>
+        <section id="dur-long-sec" class="hidden cat"></section>
+        <section id="dur-short-sec" class="hidden cat"></section>
+        <section id="dur-zero-sec" class="hidden cat"></section>
+        <section id="dur-rdzero-sec" class="hidden cat"></section>
+        <section id="dur-odrd-sec" class="hidden cat"></section>
+        <section id="cost-budget-sec" class="hidden cat"></section>
+        <section id="cost-ev-sec" class="hidden cat"></section>
+        <section id="cost-regress-sec" class="hidden cat"></section>
     </div>
-
-    <script src="./static/js/app.js"></script>
-    <script src="./static/js/parse.js"></script>
-    <script src="./static/js/taskVariance.js"></script>
-    <script src="./static/js/utilities.js"></script>
-    <script src="./static/js/variance.js"></script>
-    <script src="./static/js/objects.js"></script>
 </body>
+<script src="./static/js/menuCollapse.js"></script>
+<script src="./static/js/parse.js"></script>
+<script src="./static/js/utilities.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./static/js/main.js"></script>
 </html>
