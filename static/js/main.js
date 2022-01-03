@@ -245,7 +245,7 @@ let taskChanges = {
             return this.tasks.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.start), 
                 formatDate(getTask(task, projects.previous).start), 
-                dateVariance(task.start, getTask(task, projects.previous).start)
+                formatVariance(dateVariance(task.start, getTask(task, projects.previous).start))
             ])
         }
     },
@@ -259,7 +259,7 @@ let taskChanges = {
             return this.tasks.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.finish), 
                 formatDate(getTask(task, projects.previous).finish), 
-                dateVariance(task.finish, getTask(task, projects.previous).finish)
+                formatVariance(dateVariance(task.finish, getTask(task, projects.previous).finish))
             ])
         }
     },
