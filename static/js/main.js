@@ -689,10 +689,15 @@ const analyzeProject = proj => {
     proj.physPercentComp = (x + y) / 2
     proj.schedPercentComp = 1 - proj.remScheduleDuration / proj.scheduleDuration
 
-    proj.budget = budgetedCost(proj)
+    proj.budgetCost = budgetedCost(proj)
     proj.actualCost = actualCost(proj)
     proj.thisPeriodCost = thisPeriodCost(proj)
     proj.remainingCost = remainingCost(proj)
+
+    proj.budgetQty = budgetedQty(proj)
+    proj.actualQty = actualQty(proj)
+    proj.thisPeriodQty = thisPeriodQty(proj)
+    proj.remainingQty = remainingQty(proj)
     return proj
 }
 
@@ -714,10 +719,15 @@ function updateProjCard(name, value){
     if (proj.plan_end_date){document.getElementById(`${name}-mfb`).textContent = formatDate(proj.plan_end_date)}
     else {document.getElementById(`${name}-mfb`).textContent = "None"}
 
-    document.getElementById(`${name}-budget`).textContent = formatCost(proj.budget)
+    document.getElementById(`${name}-budget`).textContent = formatCost(proj.budgetCost)
     document.getElementById(`${name}-actual-cost`).textContent = formatCost(proj.actualCost)
     document.getElementById(`${name}-this-period`).textContent = formatCost(proj.thisPeriodCost)
     document.getElementById(`${name}-remaining-cost`).textContent = formatCost(proj.remainingCost)
+
+    document.getElementById(`${name}-qty`).textContent = formatNumber(proj.budgetQty)
+    document.getElementById(`${name}-actual-qty`).textContent = formatNumber(proj.actualQty)
+    document.getElementById(`${name}-this-period-qty`).textContent = formatNumber(proj.thisPeriodQty)
+    document.getElementById(`${name}-remaining-qty`).textContent = formatNumber(proj.remainingQty)
 
     document.getElementById(`${name}-tasks`).textContent = proj.tasks.size.toLocaleString()
     document.getElementById(`${name}-not-started`).textContent = proj.notStarted.length.toLocaleString()
@@ -1114,7 +1124,6 @@ function updateProjCard(name, value){
         document.getElementById("start-var").textContent = formatVariance(dateVariance(projects.current.plan_start_date, projects.previous.plan_start_date))
         document.getElementById("dd-var").textContent = formatVariance(dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date))
         document.getElementById("end-var").textContent = formatVariance(dateVariance(projects.current.scd_end_date, projects.previous.scd_end_date))
-        console.log(dateVariance(projects.current.scd_end_date, projects.previous.scd_end_date))
         document.getElementById("mfb-var").textContent = formatVariance(dateVariance(projects.current.plan_end_date, projects.previous.plan_end_date))
         document.getElementById("tasks-var").textContent = formatVariance((projects.current.tasks.size - projects.previous.tasks.size))
         document.getElementById("not-started-var").textContent = formatVariance((projects.current.notStarted.length - projects.previous.notStarted.length))
@@ -1142,7 +1151,7 @@ function updateProjCard(name, value){
         document.getElementById("physical-per-var").textContent = formatPercent(projects.current.physPercentComp - projects.previous.physPercentComp)
         
         
-        if (projects.current.budget && projects.previous.budget) {
+        if (projects.current.budgetCost && projects.previous.budgetCost) {
             const currCostPer = projects.current.actualCost / projects.current.budget
             const prevCostPer = projects.previous.actualCost / projects.previous.budget
             document.getElementById("cost-per-var").textContent = formatPercent(currCostPer - prevCostPer)
@@ -1150,10 +1159,15 @@ function updateProjCard(name, value){
         } else {
             document.getElementById("cost-per-var").textContent = "N/A"
         }
-        document.getElementById("budget-var").textContent = formatCost(projects.current.budget - projects.previous.budget)
+        document.getElementById("budget-var").textContent = formatCost(projects.current.budgetCost - projects.previous.budgetCost)
         document.getElementById("actual-cost-var").textContent = formatCost(projects.current.actualCost - projects.previous.actualCost)
         document.getElementById("this-period-var").textContent = formatCost(projects.current.thisPeriodCost - projects.previous.thisPeriodCost)
         document.getElementById("remaining-cost-var").textContent = formatCost(projects.current.remainingCost - projects.previous.remainingCost)
+        
+        document.getElementById("qty-var").textContent = formatVariance(projects.current.budgetQty - projects.previous.budgetQty)
+        document.getElementById("actual-qty-var").textContent = formatVariance(projects.current.actualQty - projects.previous.actualQty)
+        document.getElementById("this-period-qty-var").textContent = formatVariance(projects.current.thisPeriodQty - projects.previous.thisPeriodQty)
+        document.getElementById("remaining-qty-var").textContent = formatVariance(projects.current.remainingQty - projects.previous.remainingQty)
     }
 }
 

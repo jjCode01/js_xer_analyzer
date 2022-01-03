@@ -3,6 +3,11 @@ const actualCost = obj => obj?.resources?.reduce((a, r) => a + r.act_reg_cost + 
 const thisPeriodCost = obj => obj?.resources?.reduce((a, r) => a + r.act_this_per_cost, 0.0) ?? 0.0;
 const remainingCost = obj => obj?.resources?.reduce((a, r) => a + r.remain_cost, 0.0) ?? 0.0;
 
+const budgetedQty = obj => obj?.resources?.reduce((a, r) => a + r.target_qty, 0.0) ?? 0.0;
+const actualQty = obj => obj?.resources?.reduce((a, r) => a + r.act_reg_qty + r.act_ot_qty, 0.0) ?? 0.0;
+const thisPeriodQty = obj => obj?.resources?.reduce((a, r) => a + r.act_this_per_qty, 0.0) ?? 0.0;
+const remainingQty = obj => obj?.resources?.reduce((a, r) => a + r.remain_qty, 0.0) ?? 0.0;
+
 const formatDate = dt => {
     if (dt instanceof Date && !isNaN(dt)) {
         const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
