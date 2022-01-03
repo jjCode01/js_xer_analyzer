@@ -1152,8 +1152,8 @@ function updateProjCard(name, value){
         
         
         if (projects.current.budgetCost && projects.previous.budgetCost) {
-            const currCostPer = projects.current.actualCost / projects.current.budget
-            const prevCostPer = projects.previous.actualCost / projects.previous.budget
+            const currCostPer = projects.current.actualCost / projects.current.budgetCost
+            const prevCostPer = projects.previous.actualCost / projects.previous.budgetCost
             document.getElementById("cost-per-var").textContent = formatPercent(currCostPer - prevCostPer)
             // document.getElementById("cost-progress").textContent = formatPercent(currCostPer)
         } else {
