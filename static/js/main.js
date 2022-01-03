@@ -182,30 +182,32 @@ let updates = {
     }
 }
 
+const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
+
 let taskChanges = {
     added: {
         title: "Added Activities",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Start', 'Finish'],
+        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
+        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Start', 'Finish', 'Longest\r\nPath'],
         tasks: [],
         id: "tk-added",
         getRows: function() {
             return this.tasks.map(task => [
                 task.task_code, task.task_name, task.status, task.origDur, 
-                formatDate(task.start), formatDate(task.finish)
+                formatDate(task.start), formatDate(task.finish), checkLongestPath(task)
             ])
         }
     },
     deleted: {
         title: "Deleted Activities",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Start', 'Finish'],
+        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
+        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Start', 'Finish', 'Longest\r\nPath'],
         tasks: [],
         id: "tk-deleted",
         getRows: function() {
             return this.tasks.map(task => [
                 task.task_code, task.task_name, task.status, task.origDur, 
-                formatDate(task.start), formatDate(task.finish)
+                formatDate(task.start), formatDate(task.finish), checkLongestPath(task)
             ])
         }
     },
@@ -1047,8 +1049,6 @@ function updateProjCard(name, value){
     }
 
     if (name === "previous") {
-        console.log("Running Previous")
-
         const currTasks = [...projects.current.tasks.values()].sort(sortById)
         const prevTasks = [...projects.previous.tasks.values()].sort(sortById)
 
