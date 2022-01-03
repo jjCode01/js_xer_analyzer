@@ -110,6 +110,19 @@ let updates = {
             ])
         }
     },
+    startFinish: {
+        title: "Activities Started and Finished",
+        align: ['left', 'left', 'left', 'center', 'center'],
+        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
+        tasks: [],
+        id: "ud-startFinish",
+        getRows: function() {
+            return this.tasks.map(task => [
+                task.task_code, task.task_name, task.status, formatDate(task.start), 
+                formatDate(task.finish)
+            ])
+        }
+    },
     percent: {
         title: "Updated Percent Completes",
         align: ['left', 'left', 'left', 'left', 'center', 'center', 'center'],
@@ -735,7 +748,7 @@ function updateProjCard(name, value){
     }
 
     function updateElements(obj, catId) {
-        let total = 0
+        // let total = 0
         Object.values(obj).forEach(update => {
             document.getElementById(update.id).textContent = (update.tasks.length).toLocaleString()
             removeElements(`${update.id}-sec`)
@@ -743,7 +756,7 @@ function updateProjCard(name, value){
                 const table = createTable(update.title, update.align, update.columns, update.getRows());
                 updateSection(`${update.id}-sec`, table)
                 activateButton(`${update.id}-btn`, `${update.id}-sec`)
-                total += update.tasks.length
+                // total += update.tasks.length
             }
         })
     }
@@ -805,8 +818,7 @@ function updateProjCard(name, value){
         console.log("Running Current")
         const currTasks = [...projects.current.tasks.values()].sort(sortById)
         const currResources = projects.current.resources
-        const currLogic = new Map(projects.current.rels.map(r => [setRelKey(projects.current.tasks, r), r]))
-
+        // const currLogic = new Map(projects.current.rels.map(r => [setRelKey(projects.current.tasks, r), r]))
 
         document.getElementById('title').innerText = `XER Analyzer - ${projects.current.proj_short_name}`
 
@@ -1043,8 +1055,9 @@ function updateProjCard(name, value){
         const currResources = projects.current.resources
         const prevResources = projects.previous.resources
 
-        updates.started.tasks = currTasks.filter(task => !task.notStarted && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted).sort(sortByStart)
-        updates.finished.tasks = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && !getTask(task, projects.previous).completed)).sort(sortByFinish)
+        updates.started.tasks = currTasks.filter(task => task.inProgress && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted).sort(sortByStart)
+        updates.finished.tasks = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).inProgress)).sort(sortByFinish)
+        updates.startFinish.tasks = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted)).sort(sortByFinish)
         updates.percent.tasks = (currTasks.filter(task => hasTask(task, projects.previous) && task.percent > getTask(task, projects.previous).percent)).sort(sortByStart)
         updates.duration.tasks = (currTasks.filter(task => task.remDur !== task.origDur && hasTask(task, projects.previous) && task.remDur < getTask(task, projects.previous).remDur)).sort(sortByStart)
         updates.cost.tasks = currTasks.filter(task => hasTask(task, projects.previous) && actualCost(task) !== actualCost(getTask(task, projects.previous)))
