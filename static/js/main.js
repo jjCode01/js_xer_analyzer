@@ -753,8 +753,8 @@ function updateProjCard(name, value){
 
     document.getElementById(`${name}-schedule-per`).textContent = formatPercent(proj.schedPercentComp)
     document.getElementById(`${name}-physical-per`).textContent = formatPercent(proj.physPercentComp)
-    if (proj.budget) {
-        document.getElementById(`${name}-cost-per`).textContent = formatPercent(proj.actualCost / proj.budget)
+    if (proj.budgetCost) {
+        document.getElementById(`${name}-cost-per`).textContent = formatPercent(proj.actualCost / proj.budgetCost)
     } else {
         document.getElementById(`${name}-cost-per`).textContent = "N/A"
     }
@@ -836,8 +836,8 @@ function updateProjCard(name, value){
 
         document.getElementById("sched-progress").style.width = `${formatPercent(projects.current.schedPercentComp)}`
         document.getElementById("phys-progress").style.width = `${formatPercent(projects.current.physPercentComp)}`
-        if (projects.current.budget) {
-            document.getElementById("cost-progress").style.width = `${formatPercent(projects.current.actualCost / projects.current.budget)}`
+        if (projects.current.budgetCost) {
+            document.getElementById("cost-progress").style.width = `${formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
         }
 
         document.getElementById("current-not-started-per").textContent = formatPercent(projects.current.notStarted.length / projects.current.tasks.size)
