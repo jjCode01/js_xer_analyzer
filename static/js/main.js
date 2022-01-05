@@ -83,587 +83,6 @@ function updateSection(id, el){
     document.getElementById(id).append(el);
 }
 
-let updates = {
-    started: {
-        title: "Activities Started",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
-        tasks: undefined,
-        id: "ud-started",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, 
-                formatDate(task.start), formatDate(task.finish)
-            ])
-        }
-    },
-    finished: {
-        title: "Activities Finished",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
-        tasks: [],
-        id: "ud-finished",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.start), 
-                formatDate(task.finish)
-            ])
-        }
-    },
-    startFinish: {
-        title: "Activities Started and Finished",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
-        tasks: [],
-        id: "ud-startFinish",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.start), 
-                formatDate(task.finish)
-            ])
-        }
-    },
-    percent: {
-        title: "Updated Percent Completes",
-        align: ['left', 'left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Percent\r\nType', '% Comp', 'Prev\r\n% Comp', 'Var'],
-        tasks: [],
-        id: "ud-percent",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.percentType, 
-                formatPercent(task.percent), formatPercent(getTask(task, projects.previous).percent), 
-                formatPercent(task.percent - getTask(task, projects.previous).percent)
-            ])
-        }
-    },
-    duration: {
-        title: "Updated Remaining Durations",
-        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Rem\r\nDur', 'Prev\r\nRem\r\nDur', 'Var'],
-        tasks: [],
-        id: "ud-duration",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatNumber(task.origDur), 
-                formatNumber(task.remDur), formatNumber(getTask(task, projects.previous).remDur), 
-                formatNumber(task.remDur - getTask(task, projects.previous).remDur)
-            ])
-        }
-    },
-    cost: {
-        title: "Updated Actual Cost",
-        align: ['left', 'left', 'left', 'right', 'right', 'right', 'right'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Budgeted\r\nCost', 'Actual\r\nCost', 'Prev\r\nActual\r\nCost', 'Var'],
-        tasks: [],
-        id: "ud-cost",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatCost(budgetedCost(task)), 
-                formatCost(actualCost(task)), formatCost(actualCost(getTask(task, projects.previous))), 
-                formatCost(actualCost(task) - actualCost(getTask(task, projects.previous)))
-            ])
-        }
-    },
-    regress: {
-        title: "Regressive Updates",
-        align: ['left', 'left', 'left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Prev\r\nStatus', 'Orig\r\nDur', 'Rem\r\nDur', 'Prev\r\nRem\r\nDur', 'RD\r\nVar', '%\r\nComp', 'Prev\r\n%\r\nComp', '%\r\nVar'],
-        tasks: [],
-        id: "ud-regress",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, getTask(task, projects.previous).status, task.origDur, 
-                task.remDur, getTask(task, projects.previous).remDur, formatNumber(task.remDur - getTask(task, projects.previous).remDur),
-                formatPercent(task.percent), formatPercent(getTask(task, projects.previous).percent), 
-                formatPercent(task.percent - getTask(task, projects.previous).percent)
-            ])
-        }
-    }
-}
-
-const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
-
-let taskChanges = {
-    added: {
-        title: "Added Activities",
-        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Start', 'Finish', 'Longest\r\nPath'],
-        tasks: [],
-        id: "tk-added",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.origDur, 
-                formatDate(task.start), formatDate(task.finish), checkLongestPath(task)
-            ])
-        }
-    },
-    deleted: {
-        title: "Deleted Activities",
-        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Start', 'Finish', 'Longest\r\nPath'],
-        tasks: [],
-        id: "tk-deleted",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.origDur, 
-                formatDate(task.start), formatDate(task.finish), checkLongestPath(task)
-            ])
-        }
-    },
-    name: {
-        title: "Revised Activity Names",
-        align: ['left', 'left', 'left'],
-        columns: ['Act ID', 'Act Name', 'Prev Name'],
-        tasks: [],
-        id: "tk-name",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, getTask(task, projects.previous).task_name
-            ])
-        }
-    },
-    duration: {
-        title: "Revised Original Durations",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 'Prev\r\nOrig\r\nDur', 'Var'],
-        tasks: [],
-        id: "tk-duration",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatNumber(task.origDur), 
-                formatNumber(getTask(task, projects.previous).origDur), 
-                formatNumber(task.origDur - getTask(task, projects.previous).origDur)
-            ])
-        }
-    },
-    calendar: {
-        title: "Revised Activity Calendars",
-        align: ['left', 'left', 'left', 'left', 'left'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Calendar', 'Prev\r\nCalendar'],
-        tasks: [],
-        id: "tk-calendar",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.calendar.clndr_name, 
-                getTask(task, projects.previous).calendar.clndr_name 
-            ])
-        }
-    },
-    start: {
-        title: "Revised Actual Starts",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Actual\r\nStart', 'Prev\r\nActual\r\nStart', 'Var'],
-        tasks: [],
-        id: "tk-start",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.start), 
-                formatDate(getTask(task, projects.previous).start), 
-                formatVariance(dateVariance(task.start, getTask(task, projects.previous).start))
-            ])
-        }
-    },
-    finish: {
-        title: "Revised Actual Finishes",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Actual\r\nFinish', 'Prev\r\nActual\r\nFinish', 'Var'],
-        tasks: [],
-        id: "tk-finish",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.finish), 
-                formatDate(getTask(task, projects.previous).finish), 
-                formatVariance(dateVariance(task.finish, getTask(task, projects.previous).finish))
-            ])
-        }
-    },
-    wbs: {
-        title: "Revised WBS Assignment",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'WBS', 'Prev\r\nWBS'],
-        tasks: [],
-        id: "tk-wbs",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.wbs.wbsID, 
-                getTask(task, projects.previous).wbs.wbsID
-            ])
-        }
-    },
-}
-
-let logicChanges = {
-    added: {
-        title: "Added Relationships",
-        align: ['left', 'left', 'left', 'left', 'center', 'center'],
-        columns: ['Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', 'Link', 'Lag'],
-        tasks: [],
-        id: "rl-added",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.predTask.task_code, task.predTask.task_name, task.succTask.task_code, task.succTask.task_name, task.link, task.lag 
-            ])
-        }
-    },
-    deleted: {
-        title: "Deleted Relationships",
-        align: ['left', 'left', 'left', 'left', 'center', 'center'],
-        columns: ['Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', 'Link', 'Lag'],
-        tasks: [],
-        id: "rl-deleted",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.predTask.task_code, task.predTask.task_name, task.succTask.task_code, task.succTask.task_name, task.link, task.lag 
-            ])
-        }
-    },
-    revised: {
-        title: "Revised Relationships",
-        align: ['left', 'left', 'left', 'left', 'center', 'center'],
-        columns: ['Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', 'Link:Lag', 'Prev\r\nLink:Lag'],
-        tasks: [],
-        id: "rl-revised",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.predTask.task_code, task.predTask.task_name, task.succTask.task_code, task.succTask.task_name, `${task.link}:${task.lag}`, `${getPrevLogic(task).link}:${getPrevLogic(task).lag}` 
-            ])
-        }
-    },
-}
-
-let resourceChanges = {
-    added: {
-        title: "Added Resources",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nQty', 'Budgeted\r\nCost'],
-        tasks: [],
-        id: "rs-added",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task.task_code, task.task.task_name, task.task.status, task.rsrcName, formatNumber(task.target_qty), formatCost(task.target_cost)
-            ])
-        }
-    },
-    deleted: {
-        title: "Deleted Resources",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nQty', 'Budgeted\r\nCost'],
-        tasks: [],
-        id: "rs-deleted",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task.task_code, task.task.task_name, task.task.status, task.rsrcName, formatNumber(task.target_qty), formatCost(task.target_cost)
-            ])
-        }
-    },
-    revisedCost: {
-        title: "Revised Resource Cost",
-        align: ['left', 'left', 'left', 'left', 'right', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nCost', 'Prev\r\nBudgeted\r\nCost', 'Var'],
-        tasks: [],
-        id: "rs-cost",
-        getRows: function() {
-            return this.tasks.map(res => {
-                const prevCost = getPrevRes(res).target_cost;
-                return [
-                    res.task.task_code, res.task.task_name, res.task.status, 
-                    res.rsrcName, formatCost(res.target_cost), formatCost(prevCost), 
-                    formatCost(res.target_cost - prevCost)
-                ]
-            })
-        }
-    },
-    revisedUnits: {
-        title: "Revised Resource Quantity",
-        align: ['left', 'left', 'left', 'left', 'right', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nQty', 'Prev\r\nBudgeted\r\nQty', 'Var'],
-        tasks: [],
-        id: "rs-units",
-        getRows: function() {
-            return this.tasks.map(res => {
-                const prevQty = getPrevRes(res).target_qty;
-                return [res.task.task_code, res.task.task_name, res.task.status, res.rsrcName, formatNumber(res.target_qty), formatNumber(prevQty), formatNumber(res.target_qty - prevQty)]
-            })
-        }
-    },
-}
-
-let constraintChanges = {
-    addedPrim: {
-        title: "Added Primary Constraints",
-        align: ['left', 'left', 'left', 'left', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Primary\r\nConstraint\r\n', 'Constraint\r\nDate'],
-        tasks: [],
-        id: "cs-added-prim",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.primeConstraint, formatDate(task.cstr_date)
-            ])
-        }
-    },
-    deletedPrim: {
-        title: "Deleted Primary Constraints",
-        align: ['left', 'left', 'left', 'left', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Primary\r\nConstraint', 'Constraint\r\nDate'],
-        tasks: [],
-        id: "cs-deleted-prim",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.primeConstraint, formatDate(task.cstr_date)
-            ])
-        }
-    },
-    revisedPrim: {
-        title: "Revised Primary Constraint Dates",
-        align: ['left', 'left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Constraint\r\nType', 'Constraint\r\nDate', 'Prev\r\nConstraint\r\nDate', 'Var\r\n(Days)'],
-        tasks: [],
-        id: "cs-revised-prim",
-        getRows: function() {
-            return this.tasks.map(task => {
-                const prevDate = getTask(task, projects.previous).cstr_date
-                const variance = (task.cstr_date && prevDate) ? (task.cstr_date.getTime() - prevDate.getTime()) / (1000 * 3600 * 24) : "N/A"
-                return [
-                    task.task_code, task.task_name, task.status, task.primeConstraint, 
-                    formatDate(task.cstr_date), formatDate(getTask(task, projects.previous).cstr_date), 
-                    formatNumber(variance)
-                ]
-            })
-        }
-    },
-}
-
-let openEnds = {
-    predecessor: {
-        title: "Activities With No Predecessor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        tasks: [],
-        id: "open-pred",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.taskType
-            ])
-        }
-    },
-    successor: {
-        title: "Activities With No Successor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        tasks: [],
-        id: "open-succ",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.taskType
-            ])
-        }
-    },
-    start: {
-        title: "Activities With No Start (SS or FS) Predecessor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        tasks: [],
-        id: "open-start",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.taskType
-            ])
-        }
-    },
-    finish: {
-        title: "Activities With No Finish (FS or FF) Successor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        tasks: [],
-        id: "open-finish",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, task.taskType
-            ])
-        }
-    },
-    duplicate: {
-        title: "Duplicate Relationships",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', "Link:Lag", "Duplicate\r\nLink:Lag"],
-        tasks: [],
-        id: "open-duplicate",
-        getRows: function() {
-            console.log(this.tasks.length)
-            return this.tasks.map(task => [
-                task[0].predTask.task_code, task[0].predTask.task_name, 
-                task[0].succTask.task_code, task[0].succTask.task_name,
-                `${task[0].link}:${task[0].lag}`, `${task[1].link}:${task[1].lag}`
-            ])
-        }
-    }
-}
-
-let dateWarnings = {
-    start: {
-        title: "Activities With Actual Start on or After Data Date",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Actual\r\nStart', 'Data\r\nData'],
-        tasks: [],
-        id: "inv-start",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.start), formatDate(projects.current.last_recalc_date)
-            ])
-        }
-    },
-    finish: {
-        title: "Activities With Actual Finish on or After Data Date",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Actual\r\nFinish', 'Data\r\nData'],
-        tasks: [],
-        id: "inv-finish",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.finish), formatDate(projects.current.last_recalc_date)
-            ])
-        }
-    },
-    expected: {
-        title: "Activities With an Expected Finish Date",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Expected\r\nFinish', 'Orig\r\nDur', 'Rem\r\nDur'],
-        tasks: [],
-        id: "inv-expected",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.expect_end_date), formatNumber(task.origDur), formatNumber(task.remDur)
-            ])
-        }
-    },
-    suspend: {
-        title: "Activities With Suspend / Resume Dates",
-        align: ['left', 'left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Suspend', 'Resume'],
-        tasks: [],
-        id: "inv-suspend",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.status, formatDate(task.suspend_date), formatDate(task.resume_date)
-            ])
-        }
-    }
-}
-
-let durWarnings = {
-    long: {
-        title: "Construction Activities With Original Durations Greater than 20 Days",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'],
-        tasks: [],
-        id: "dur-long",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.taskType, task.status, task.calendar.clndr_name, task.origDur
-            ])
-        }
-    },
-    short: {
-        title: "Activities With Original Durations Equal to 1 Day",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'],
-        tasks: [],
-        id: "dur-short",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.taskType, task.status, task.calendar.clndr_name, task.origDur
-            ])
-        }
-    },
-    zero: {
-        title: "Activities With Original Durations Equal to 0 Days",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'],
-        tasks: [],
-        id: "dur-zero",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.taskType, task.status, task.calendar.clndr_name, task.origDur
-            ])
-        }
-    },
-    rdzero: {
-        title: "Incomplete Activities with Zero Remaining Duration",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur', 'Rem\r\nDur'],
-        tasks: [],
-        id: "dur-rdzero",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.taskType, task.status, task.calendar.clndr_name, task.origDur, task.remDur
-            ])
-        }
-    },
-    odrd: {
-        title: "Open Activities With Unequal Original and Remaining Durations",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur', 'Rem\r\nDur'],
-        tasks: [],
-        id: "dur-odrd",
-        getRows: function() {
-            return this.tasks.map(task => [
-                task.task_code, task.task_name, task.taskType, task.status, task.calendar.clndr_name, task.origDur, task.remDur
-            ])
-        }
-    }
-}
-
-let costWarnings = {
-    budget: {
-        title: "Budgeted Cost Differs from At Completion Cost",
-        align: ['left', 'left', 'left', 'left', 'right', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nCost', 'At Completion\r\nCost', 'Variance'],
-        tasks: [],
-        id: "cost-budget",
-        getRows: function() {
-            return this.tasks.map(res => {
-                return [
-                    res.task.task_code, res.task.task_name, res.task.status, 
-                    res.rsrcName, formatCost(res.target_cost), formatCost(res.atCompletionCost), 
-                    formatCost(res.atCompletionCost - res.target_cost)
-                ]
-            })
-        }
-    },
-    earned: {
-        title: "Actual Cost to Date Differs from Earned Value",
-        align: ['left', 'left', 'left', 'left', 'center', 'right', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', '%\r\nComp', 'Actual\r\nCost', 'Earned\r\nValue', 'Variance'],
-        tasks: [],
-        id: "cost-ev",
-        getRows: function() {
-            return this.tasks.map(res => {
-                return [
-                    res.task.task_code, res.task.task_name, res.task.status, 
-                    res.rsrcName, formatPercent(res.task.percent), formatCost(res.actualCost), formatCost(res.earnedValue), 
-                    formatCost(res.actualCost - res.earnedValue)
-                ]
-            })
-        }
-    },
-    regress: {
-        title: "Regressive This Period Cost",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nCost', 'This Period\r\nCost'],
-        tasks: [],
-        id: "cost-regress",
-        getRows: function() {
-            return this.tasks.map(res => {
-                return [
-                    res.task.task_code, res.task.task_name, res.task.status, 
-                    res.rsrcName, formatCost(res.target_cost), formatCost(res.act_this_per_cost)
-                ]
-            })
-        }
-    }
-}
-
 function menuClickHandle(e, id) {
     document.querySelectorAll('.cat').forEach(el => el.style.display = 'none')
     document.querySelectorAll('.active-btn').forEach(el => el.classList.remove('active-btn'))
@@ -776,18 +195,18 @@ function updateProjCard(name, value){
     function updateElements(obj, catId) {
         // let total = 0
         Object.values(obj).forEach(update => {
-            document.getElementById(update.id).textContent = (update.tasks.length).toLocaleString()
+            document.getElementById(update.id).textContent = (update.data.length).toLocaleString()
             removeElements(`${update.id}-sec`)
-            if (update.tasks.length) {
+            if (update.data.length) {
                 const table = createTable(update.title, update.align, update.columns, update.getRows());
                 updateSection(`${update.id}-sec`, table)
                 activateButton(`${update.id}-btn`, `${update.id}-sec`)
-                // total += update.tasks.length
+                // total += update.data.length
             }
         })
     }
 
-    const changeCount = obj => Object.values(obj).reduce((total, change) => total += change.tasks.length, 0)
+    const changeCount = obj => Object.values(obj).reduce((total, change) => total += change.data.length, 0)
 
     function createDivWithTitle(title) {
         const div = document.createElement("div");
@@ -834,11 +253,11 @@ function updateProjCard(name, value){
         b.addEventListener("click", event => menuClickHandle(event, sec))
     }
 
-    const setRelKey = (tasks, logic) => {
-        const succID = tasks.get(logic.task_id).task_code
-        const predID = tasks.get(logic.pred_task_id).task_code
-        return `${succID}|${predID}|${logic.pred_type}`
-    }
+    // const setRelKey = (tasks, logic) => {
+    //     const succID = tasks.get(logic.task_id).task_code
+    //     const predID = tasks.get(logic.pred_task_id).task_code
+    //     return `${succID}|${predID}|${logic.pred_type}`
+    // }
 
     if (name === "current") {
         const currTasks = [...projects.current.tasks.values()].sort(sortById)
@@ -998,13 +417,13 @@ function updateProjCard(name, value){
         
         //************************************CHART********************************
 
-        openEnds.predecessor.tasks = currTasks.filter(task => !task.predecessors.length)
-        openEnds.successor.tasks = currTasks.filter(task => !task.successors.length)
-        openEnds.start.tasks = currTasks.filter(task => {
+        openEnds.predecessor.data = currTasks.filter(task => !task.predecessors.length)
+        openEnds.successor.data = currTasks.filter(task => !task.successors.length)
+        openEnds.start.data = currTasks.filter(task => {
             const startPreds = task.predecessors.filter(pred => pred.link === "SS" || pred.link === "FS" );
             return task.predecessors.length && !startPreds.length
         })
-        openEnds.finish.tasks = currTasks.filter(task => {
+        openEnds.finish.data = currTasks.filter(task => {
             const finSuccs = task.successors.filter(succ => succ.link === "FF" || succ.link === "FS" );
             return task.successors.length && !finSuccs.length
         })
@@ -1014,25 +433,25 @@ function updateProjCard(name, value){
             const ssLinkID = `${rel.predTask.task_code}|${rel.succTask.task_code}|SS`
 
             if (projects.current.relsById.has(ffLinkID)){
-                openEnds.duplicate.tasks.push([rel, projects.current.relsById.get(ffLinkID)])
+                openEnds.duplicate.data.push([rel, projects.current.relsById.get(ffLinkID)])
             }
             if (projects.current.relsById.has(ssLinkID)){
-                openEnds.duplicate.tasks.push([rel, projects.current.relsById.get(ssLinkID)])
+                openEnds.duplicate.data.push([rel, projects.current.relsById.get(ssLinkID)])
             }
         })
         document.getElementById("open").innerText = changeCount(openEnds).toLocaleString()
         updateElements(openEnds)
 
-        dateWarnings.start.tasks = currTasks.filter(task => !task.notStarted && task.start.getTime() >= projects.current.last_recalc_date.getTime())
-        dateWarnings.finish.tasks = currTasks.filter(task => task.completed && task.finish.getTime() >= projects.current.last_recalc_date.getTime())
-        dateWarnings.expected.tasks = currTasks.filter(task => !task.completed && task.expect_end_date)
-        dateWarnings.suspend.tasks = currTasks.filter(task => task.suspend_date)
+        dateWarnings.start.data = currTasks.filter(task => !task.notStarted && task.start.getTime() >= projects.current.last_recalc_date.getTime())
+        dateWarnings.finish.data = currTasks.filter(task => task.completed && task.finish.getTime() >= projects.current.last_recalc_date.getTime())
+        dateWarnings.expected.data = currTasks.filter(task => !task.completed && task.expect_end_date)
+        dateWarnings.suspend.data = currTasks.filter(task => task.suspend_date)
         document.getElementById("inv").innerText = changeCount(dateWarnings).toLocaleString()
         updateElements(dateWarnings)
 
-        costWarnings.budget.tasks = currResources.filter(res => res.target_cost !== res.atCompletionCost)
-        costWarnings.earned.tasks = currResources.filter(res => res.actualCost !== res.earnedValue)
-        costWarnings.regress.tasks = currResources.filter(res => {
+        costWarnings.budget.data = currResources.filter(res => res.target_cost !== res.atCompletionCost)
+        costWarnings.earned.data = currResources.filter(res => res.actualCost !== res.earnedValue)
+        costWarnings.regress.data = currResources.filter(res => {
             return (
                 (res.target_cost > 0 && res.act_this_per_cost < 0) ||
                 (res.target_cost < 0 && res.act_this_per_cost > 0)
@@ -1074,11 +493,11 @@ function updateProjCard(name, value){
             return !startsWithConstructionVerb(task) && verbs.some(word => name.includes(word))
         }
 
-        durWarnings.long.tasks = currTasks.filter(task => !task.isLOE && task.origDur > 20 && !isSubmittal(task))
-        durWarnings.short.tasks = currTasks.filter(task => !task.isLOE && task.origDur === 1 && !oneDayOK(task))
-        durWarnings.zero.tasks = currTasks.filter(task => !task.isMilestone && task.origDur === 0)
-        durWarnings.rdzero.tasks = currTasks.filter(task => !task.isMilestone && !task.completed & !task.origDur === 0 & task.remDur === 0)
-        durWarnings.odrd.tasks = currTasks.filter(task => task.notStarted && task.origDur !== task.remDur)
+        durWarnings.long.data = currTasks.filter(task => !task.isLOE && task.origDur > 20 && !isSubmittal(task))
+        durWarnings.short.data = currTasks.filter(task => !task.isLOE && task.origDur === 1 && !oneDayOK(task))
+        durWarnings.zero.data = currTasks.filter(task => !task.isMilestone && task.origDur === 0)
+        durWarnings.rdzero.data = currTasks.filter(task => !task.isMilestone && !task.completed & !task.origDur === 0 & task.remDur === 0)
+        durWarnings.odrd.data = currTasks.filter(task => task.notStarted && task.origDur !== task.remDur)
         document.getElementById("dur").innerText = changeCount(durWarnings).toLocaleString()
         updateElements(durWarnings)
     }
@@ -1090,13 +509,13 @@ function updateProjCard(name, value){
         const currResources = projects.current.resources
         const prevResources = projects.previous.resources
 
-        updates.started.tasks = currTasks.filter(task => task.inProgress && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted).sort(sortByStart)
-        updates.finished.tasks = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).inProgress)).sort(sortByFinish)
-        updates.startFinish.tasks = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted)).sort(sortByFinish)
-        updates.percent.tasks = (currTasks.filter(task => hasTask(task, projects.previous) && task.percent > getTask(task, projects.previous).percent)).sort(sortByStart)
-        updates.duration.tasks = (currTasks.filter(task => task.remDur !== task.origDur && hasTask(task, projects.previous) && task.remDur < getTask(task, projects.previous).remDur)).sort(sortByStart)
-        updates.cost.tasks = currTasks.filter(task => hasTask(task, projects.previous) && actualCost(task) !== actualCost(getTask(task, projects.previous)))
-        updates.regress.tasks = currTasks.filter(task => {
+        updates.started.data = currTasks.filter(task => task.inProgress && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted).sort(sortByStart)
+        updates.finished.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).inProgress)).sort(sortByFinish)
+        updates.startFinish.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted)).sort(sortByFinish)
+        updates.percent.data = (currTasks.filter(task => hasTask(task, projects.previous) && task.percent > getTask(task, projects.previous).percent)).sort(sortByStart)
+        updates.duration.data = (currTasks.filter(task => task.remDur !== task.origDur && hasTask(task, projects.previous) && task.remDur < getTask(task, projects.previous).remDur)).sort(sortByStart)
+        updates.cost.data = currTasks.filter(task => hasTask(task, projects.previous) && actualCost(task) !== actualCost(getTask(task, projects.previous)))
+        updates.regress.data = currTasks.filter(task => {
             return (
                 hasTask(task, projects.previous) && 
                 ((!task.completed && getTask(task, projects.previous).completed) ||
@@ -1108,39 +527,50 @@ function updateProjCard(name, value){
         document.getElementById("ud").innerText = changeCount(updates).toLocaleString()
         updateElements(updates)
 
-        taskChanges.added.tasks = currTasks.filter(task => !hasTask(task, projects.previous))
-        taskChanges.deleted.tasks = prevTasks.filter(task => !projects.current.tasksByCode.has(task.task_code))
-        taskChanges.name.tasks = currTasks.filter(task => hasTask(task, projects.previous) && task.task_name !== getTask(task, projects.previous).task_name)
-        taskChanges.duration.tasks = currTasks.filter(task => hasTask(task, projects.previous) && task.origDur !== getTask(task, projects.previous).origDur)
-        taskChanges.calendar.tasks = currTasks.filter(task => hasTask(task, projects.previous) && task.calendar.clndr_name !== getTask(task, projects.previous).calendar.clndr_name)
-        taskChanges.start.tasks = currTasks.filter(task => hasTask(task, projects.previous) && !task.notStarted && !getTask(task, projects.previous).notStarted && task.start.getTime() !== getTask(task, projects.previous).start.getTime()).sort(sortByStart)
-        taskChanges.finish.tasks = currTasks.filter(task => hasTask(task, projects.previous) && task.completed && getTask(task, projects.previous).completed && task.finish.getTime() !== getTask(task, projects.previous).finish.getTime()).sort(sortByFinish)
-        taskChanges.wbs.tasks = currTasks.filter(task => hasTask(task, projects.previous) && task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
+        taskChanges.added.data = currTasks.filter(task => !hasTask(task, projects.previous))
+        taskChanges.deleted.data = prevTasks.filter(task => !projects.current.tasksByCode.has(task.task_code))
+        taskChanges.name.data = currTasks.filter(task => hasTask(task, projects.previous) && task.task_name !== getTask(task, projects.previous).task_name)
+        taskChanges.duration.data = currTasks.filter(task => hasTask(task, projects.previous) && task.origDur !== getTask(task, projects.previous).origDur)
+        taskChanges.calendar.data = currTasks.filter(task => hasTask(task, projects.previous) && task.calendar.clndr_name !== getTask(task, projects.previous).calendar.clndr_name)
+        taskChanges.start.data = currTasks.filter(task => hasTask(task, projects.previous) && !task.notStarted && !getTask(task, projects.previous).notStarted && task.start.getTime() !== getTask(task, projects.previous).start.getTime()).sort(sortByStart)
+        taskChanges.finish.data = currTasks.filter(task => hasTask(task, projects.previous) && task.completed && getTask(task, projects.previous).completed && task.finish.getTime() !== getTask(task, projects.previous).finish.getTime()).sort(sortByFinish)
+        taskChanges.wbs.data = currTasks.filter(task => hasTask(task, projects.previous) && task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
         document.getElementById("tk").innerText = changeCount(taskChanges).toLocaleString()
         updateElements(taskChanges)
 
-        logicChanges.added.tasks = projects.current.rels.filter(rel => !prevHasLogic(rel))
-        logicChanges.deleted.tasks = projects.previous.rels.filter(rel => !projects.current.relsById.has(rel.logicId))
-        logicChanges.revised.tasks = projects.current.rels.filter(rel => prevHasLogic(rel) && rel.lag !== getPrevLogic(rel).lag)
+        logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
+        logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.relsById.has(rel.logicId))
+        logicChanges.revised.data = projects.current.rels.filter(rel => prevHasLogic(rel) && rel.lag !== getPrevLogic(rel).lag)
         document.getElementById("rl").innerText = changeCount(logicChanges).toLocaleString()
         updateElements(logicChanges)
 
-        resourceChanges.added.tasks = currResources.filter(res => !prevHasRes(res))
-        resourceChanges.deleted.tasks = prevResources.filter(res => !currHasRes(res))
-        resourceChanges.revisedCost.tasks = currResources.filter(res => prevHasRes(res) && res.target_cost !== getPrevRes(res).target_cost)
-        resourceChanges.revisedUnits.tasks = currResources.filter(res => prevHasRes(res) && res.target_qty !== getPrevRes(res).target_qty)
+        resourceChanges.added.data = currResources.filter(res => !prevHasRes(res))
+        resourceChanges.deleted.data = prevResources.filter(res => !currHasRes(res))
+        resourceChanges.revisedCost.data = currResources.filter(res => prevHasRes(res) && res.target_cost !== getPrevRes(res).target_cost)
+        resourceChanges.revisedUnits.data = currResources.filter(res => prevHasRes(res) && res.target_qty !== getPrevRes(res).target_qty)
         document.getElementById("rs").innerText = changeCount(resourceChanges).toLocaleString()
         updateElements(resourceChanges)
 
-        constraintChanges.addedPrim.tasks = currTasks.filter(task => hasTask(task, projects.previous) && task.primeConstraint && task.primeConstraint !== getTask(task, projects.previous).primeConstraint)
-        constraintChanges.deletedPrim.tasks = prevTasks.filter(task => hasTask(task, projects.current) && task.primeConstraint && task.primeConstraint !== getTask(task, projects.previous).primeConstraint)
-        constraintChanges.revisedPrim.tasks = currTasks.filter(task => {
+        constraintChanges.addedPrim.data = currTasks.filter(task => hasTask(task, projects.previous) && task.primeConstraint && task.primeConstraint !== getTask(task, projects.previous).primeConstraint)
+        constraintChanges.deletedPrim.data = prevTasks.filter(task => hasTask(task, projects.current) && task.primeConstraint && task.primeConstraint !== getTask(task, projects.previous).primeConstraint)
+        constraintChanges.revisedPrim.data = currTasks.filter(task => {
             return (
                 hasTask(task, projects.previous) && 
                 task.primeConstraint &&
                 task.cstr_date &&
                 task.primeConstraint === getTask(task, projects.previous).primeConstraint &&
                 task.cstr_date.getTime() !== getTask(task, projects.previous).cstr_date.getTime()
+            )
+        })
+        constraintChanges.addedSec.data = currTasks.filter(task => hasTask(task, projects.previous) && task.secondConstraint && task.secondConstraint !== getTask(task, projects.previous).secondConstraint)
+        constraintChanges.deletedSec.data = prevTasks.filter(task => hasTask(task, projects.current) && task.secondConstraint && task.secondConstraint !== getTask(task, projects.previous).secondConstraint)
+        constraintChanges.revisedSec.data = currTasks.filter(task => {
+            return (
+                hasTask(task, projects.previous) && 
+                task.secondConstraint &&
+                task.cstr_date2 &&
+                task.secondConstraint === getTask(task, projects.previous).secondConstraint &&
+                task.cstr_date2.getTime() !== getTask(task, projects.previous).cstr_date2.getTime()
             )
         })
         document.getElementById("cs").innerText = changeCount(constraintChanges).toLocaleString()

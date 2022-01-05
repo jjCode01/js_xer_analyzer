@@ -36,10 +36,11 @@ formatVariance = (num) => {
 
 const formatCost = cost => formatNumber(cost, 2)
 
-const formatPercent = value => {
+const formatPercent = (value, sign="auto") => {
     const returnString = Intl.NumberFormat('en-US', {
         style: 'percent',
         maximumFractionDigits: 1,
+        signDisplay: sign,
     }).format(value)
     return returnString
 }
