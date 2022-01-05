@@ -482,6 +482,21 @@ let openEnds = {
                 task.task_code, task.task_name, task.status, task.taskType
             ])
         }
+    },
+    duplicate: {
+        title: "Duplicate Relationships",
+        align: ['left', 'left', 'left', 'left', 'right', 'right'],
+        columns: ['Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', "Link:Lag", "Duplicate\r\nLink:Lag"],
+        tasks: [],
+        id: "open-duplicate",
+        getRows: function() {
+            console.log(this.tasks.length)
+            return this.tasks.map(task => [
+                task[0].predTask.task_code, task[0].predTask.task_name, 
+                task[0].succTask.task_code, task[0].succTask.task_name,
+                `${task[0].link}:${task[0].lag}`, `${task[1].link}:${task[1].lag}`
+            ])
+        }
     }
 }
 
@@ -703,7 +718,6 @@ const analyzeProject = proj => {
 
 function updateProjCard(name, value){
     let proj = analyzeProject(tables[name].PROJECT[value])
-    console.log(proj.name)
     projects[name] = proj
 
     document.getElementById(`${name}-project-id`).textContent = proj.proj_short_name
@@ -827,7 +841,6 @@ function updateProjCard(name, value){
     }
 
     if (name === "current") {
-        console.log("Running Current")
         const currTasks = [...projects.current.tasks.values()].sort(sortById)
         const currResources = projects.current.resources
         // const currLogic = new Map(projects.current.rels.map(r => [setRelKey(projects.current.tasks, r), r]))
@@ -994,6 +1007,18 @@ function updateProjCard(name, value){
         openEnds.finish.tasks = currTasks.filter(task => {
             const finSuccs = task.successors.filter(succ => succ.link === "FF" || succ.link === "FS" );
             return task.successors.length && !finSuccs.length
+        })
+
+        projects.current.fsLogic.forEach(rel => {
+            const ffLinkID = `${rel.predTask.task_code}|${rel.succTask.task_code}|FF`
+            const ssLinkID = `${rel.predTask.task_code}|${rel.succTask.task_code}|SS`
+
+            if (projects.current.relsById.has(ffLinkID)){
+                openEnds.duplicate.tasks.push([rel, projects.current.relsById.get(ffLinkID)])
+            }
+            if (projects.current.relsById.has(ssLinkID)){
+                openEnds.duplicate.tasks.push([rel, projects.current.relsById.get(ssLinkID)])
+            }
         })
         document.getElementById("open").innerText = changeCount(openEnds).toLocaleString()
         updateElements(openEnds)
