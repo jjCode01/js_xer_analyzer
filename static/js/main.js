@@ -127,7 +127,7 @@ const analyzeProject = proj => {
     proj.remDurSum = [...proj.tasks.values()].reduce((rd, task) => rd += task.remDur, 0)
 
     const x = (proj.inProgress.length / 2 + proj.completed.length) / proj.tasks.size
-    const y = (1 - proj.remDurSum / proj.origDurSum) / 2
+    const y = (1 - proj.remDurSum / proj.origDurSum)
     proj.physPercentComp = (x + y) / 2
     proj.schedPercentComp = 1 - proj.remScheduleDuration / proj.scheduleDuration
 
