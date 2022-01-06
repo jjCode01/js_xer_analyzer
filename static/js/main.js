@@ -17,20 +17,26 @@ const getTask = (task, proj) => proj.tasksByCode.get(task.task_code)
 const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
 const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
 
-const getPrevRes = (res, proj) => {
+const getPrevRes = res => {
     if (tables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.get(res.resId)
     }
     if (hasTask(res.task, projects.previous)) {
-        if (res.task.resources.length === 1 && getTask(res.task, projects.previous).resources.length === 1) {
-            return getTask(res.task, projects.previous).resources[0];
-        }
-        for (let i = 0; i < getTask(res.task, projects.previous).resources.length; i++) {
-            pr = getTask(res.task, projects.previous).resources[i]
-            if (pr.target_cost === res.target_cost && pr.target_qty === res.target_qty) {
-                return pr;
+        // if (res.task.resources.length === 1 && getTask(res.task, projects.previous).resources.length === 1) {
+        //     return getTask(res.task, projects.previous).resources[0];
+        // }
+        getTask(res.task, projects.previous).resources.forEach(r => {
+            // pr = getTask(r.task, projects.previous).resources[i]
+            if (r.target_cost === res.target_cost && r.target_qty === res.target_qty) {
+                return r;
             }
-        }
+        })
+        // for (let i = 0; i < getTask(res.task, projects.previous).resources.length; i++) {
+        //     pr = getTask(res.task, projects.previous).resources[i]
+        //     if (pr.target_cost === res.target_cost && pr.target_qty === res.target_qty) {
+        //         return pr;
+        //     }
+        // }
     }
     return undefined
 }
@@ -40,12 +46,14 @@ const prevHasRes = res => {
         return projects.previous.resById.has(res.resId)
     }
     if (hasTask(res.task, projects.previous)) {
-        if (res.task.resources.length === 1 && getTask(res.task, projects.previous).resources.length === 1) {
-            return true;
-        }
-        for (let i = 0; i < getTask(res.task, projects.previous).resources.length; i++) {
-            pr = getTask(res.task, projects.previous).resources[i]
-            if (pr.target_cost === res.target_cost && pr.target_qty === res.target_qty) {
+        // if (res.task.resources.length === 1 && getTask(res.task, projects.previous).resources.length === 1) {
+        //     return true;
+        // }
+        for (r in getTask(res.task, projects.previous).resources) {
+        // for (let i = 0; i < getTask(res.task, projects.previous).resources.length; i++) {
+        //     pr = getTask(res.task, projects.previous).resources[i]
+            // if (pr.target_cost === res.target_cost && pr.target_qty === res.target_qty) {
+            if (r.target_cost === res.target_cost && r.target_qty === res.target_qty) {
                 return true;
             }
         }

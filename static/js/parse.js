@@ -176,6 +176,9 @@ const parseFile = (file, name) => {
                         tables.PROJECT[rel.pred_proj_id].tasks.get(rel.pred_task_id).successors.push(rel);
                         break;
                     case 'TASKRSRC':
+                        if (row.target_cost === 0 && row.target_qty === 0) {
+                            break;
+                        }
                         row.task = tables.PROJECT[row.proj_id].tasks.get(row.task_id);
                         row.actualCost = row.act_reg_cost + row.act_ot_cost;
                         row.atCompletionCost = row.actualCost + row.remain_cost;

@@ -25,7 +25,7 @@ const formatNumber = (num, min = 0, sign = 'never') => {
     return num < 0 ? `(${returnString})` : returnString;
 }
 
-formatVariance = (num) => {
+const formatVariance = (num) => {
     if (isNaN(num)) {return "N/A"}
     let sign = num === 0 ? "auto" : "always";
     return Intl.NumberFormat('en-US', {

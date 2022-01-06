@@ -439,7 +439,6 @@ let constraintChanges = {
             return this.data.map(task => {
                 const prevDate = getTask(task, projects.previous).cstr_date
                 const variance = (
-                    // (task.cstr_date && prevDate) ? (task.cstr_date.getTime() - prevDate.getTime()) / (1000 * 3600 * 24) : "N/A"
                     (task.cstr_date && prevDate) ? dateVariance(task.cstr_date, prevDate) : "N/A"
                 )
                 return [
@@ -462,7 +461,6 @@ let constraintChanges = {
             return this.data.map(task => {
                 const prevDate = getTask(task, projects.previous).cstr_date2
                 const variance = (
-                    // (task.cstr_date && prevDate) ? (task.cstr_date.getTime() - prevDate.getTime()) / (1000 * 3600 * 24) : "N/A"
                     (task.cstr_date2 && prevDate) ? dateVariance(task.cstr_date2, prevDate) : "N/A"
                 )
                 return [
