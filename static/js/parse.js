@@ -48,72 +48,62 @@ const setDataType = (col, val) => {
 }
 
 const parseWorkWeek = cal => {
-    console.log(cal.clndr_name)
     const start = cal.clndr_data.indexOf("DaysOfWeek()") + 12;
-    // console.log('Start:' + start)
     let end = start;
 
     const findEnd = (start, data) => {
         let parenthesesCnt = 0;
         for (let i = start; i < data.length; i++) {
-            if (data[i] === '(') {
-                parenthesesCnt++;
-            }
+            if (data[i] === '(') { parenthesesCnt++; }
             else if (data[i] === ')') {
                 if (parenthesesCnt === 0) {
                     throw 'Uneven amount of parantheses in Calendar Data';
                 }
                 parenthesesCnt--;
             }
-            if (parenthesesCnt === 0) {
-                return i;
-            }
+            if (parenthesesCnt === 0) { return i; }
         }
         return
     }
+
     try {
         end = findEnd(start, cal.clndr_data);
     } catch (e) {
         end = NaN;
         console.log(e);
     }
-    // console.log('End: ' + end);
 
     let weekDayData = cal.clndr_data.substring(start, end).slice(1, -1).trim();
-    console.log(weekDayData)
     let weekDayDataArr = weekDayData.split(/[1-7]\(\)\(/g).slice(1);
-    console.log(weekDayDataArr)
     let workWeek = {};
 
     const parseWorkShifts = (workHours) => {
         let shifts = [];
         workHours.forEach(shift => {
-            console.log("Shift: " + shift)
-            // console.log("Shifts: " + String(shift).matchAll(/[0-1][0-9]:[0-5][0-9]/g))
-            let hours = [...String(shift).matchAll(/[0-1][0-9]:[0-5][0-9]/g)]
-            console.log("Hours: " + hours)
-            hours.forEach(hr => shifts.push(hr))
+            let hours = Array.from(shift.matchAll(/[0-1][0-9]:[0-5][0-9]/g), m => m[0]);
+            for (let s = 0; s < hours.length; s += 2) {
+                shifts.push([hours[s], hours[s + 1]]);
+            }
         })
-        // for (shift in workHours) {
-        //     console.log(shift)
-        //     let hours = [...shift.matchAll(/[0-1][0-9]:[0-5][0-9]/g)]
-        //     console.log(hours)
-        //     hours.forEach(hr => shifts.push(hr))
-        // }
-        // console.log("Shifts: " + shifts)
         return shifts
     }
 
     weekDayDataArr.forEach((day, i) => {
-        console.log(i)
-        let workHourStrings = [...day.matchAll(/s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g)]
-        // console.log(workHourStrings)
+        let workHourStrings = Array.from(day.matchAll(/s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g), m => m[0])
         let shifts = parseWorkShifts(workHourStrings);
         let dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i];
-        console.log(dayName + ": " + shifts);
-        workWeek[dayName] = shifts; // need to expand, see python code
+        workWeek[dayName] = {
+            shifts: parseWorkShifts(workHourStrings),
+            hours: shifts.reduce((a, s) => {
+                let h = parseInt(s[1].slice(0,2)) - parseInt(s[0].slice(0,2));
+                let m = parseInt(String(s[1]).slice(-2)) / 60 - parseInt(String(s[0]).slice(-2)) / 60
+                return a + h + m;
+            }, 0),
+            start: shifts.length ? shifts[0][0] : "",
+            end: shifts.length ? shifts[shifts.length - 1][1] : ""
+        };
+        console.log(`${dayName}: ${workWeek[dayName].hours} hours : Start ${workWeek[dayName].start} : Finish ${workWeek[dayName].end}`)
     })
-    // ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => console.log(workWeek[d]))
     return workWeek;
 }
 
