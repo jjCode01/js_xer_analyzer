@@ -107,9 +107,36 @@ const parseWorkWeek = cal => {
     return workWeek;
 }
 
+function excelDateToJSDate(date) {
+    let tempDate = new Date((date - 25568)*86400*1000);
+    return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);
+}
+
+const parseHolidays = cal => {
+    let data = cal.clndr_data;
+    if (data.includes('d|')) {
+        let exceptions = data.split(/\(d\|/g).slice(1)
+        return exceptions.filter(e => !e.includes('s|')).map(e => excelDateToJSDate(e.slice(0, 5)));
+    }
+    return [];
+}
+
+const parseExceptions = cal => {
+    let data = cal.clndr_data;
+    if (data.includes('d|')) {
+        let exceptions = data.split(/\(d\|/g).slice(1)
+        return exceptions.filter(e => e.includes('s|')).map(e => excelDateToJSDate(e.slice(0, 5)));
+    }
+    return [];
+}
+
 const newCalendar = cal => {
+    console.log(cal.clndr_name)
     cal.default = cal.default_flag === 'Y';
     cal.week = parseWorkWeek(cal);
+    cal.holidays = parseHolidays(cal);
+    cal.exceptions = parseExceptions(cal);
+    console.log(cal.exceptions)
     return cal;
 }
 
