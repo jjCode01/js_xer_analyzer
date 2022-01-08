@@ -16,6 +16,12 @@ const formatDate = dt => {
     return '';
 }
 
+function excelDateToJSDate(date) {
+    let tempDate = new Date((date - 25568)*86400*1000);
+    return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);
+}
+
+
 const formatNumber = (num, min = 0, sign = 'never') => {
     const returnString = Intl.NumberFormat('en-US', {
         minimumFractionDigits: min,

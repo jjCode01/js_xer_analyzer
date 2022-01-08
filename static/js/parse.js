@@ -118,11 +118,6 @@ const parseWorkWeek = cal => {
     return workWeek;
 }
 
-function excelDateToJSDate(date) {
-    let tempDate = new Date((date - 25568)*86400*1000);
-    return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);
-}
-
 const parseHolidays = cal => {
     let data = cal.clndr_data;
     let holidays = {}
