@@ -61,3 +61,7 @@ function sortByFinish(a, b){
 }
 
 const sortById = (a, b) => (a.task_code > b.task_code) ? 1 : -1
+
+const isWorkDay = (date, calendar) => {
+    return calendar.week[date.getDay()].hours > 0
+}

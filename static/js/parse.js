@@ -31,6 +31,8 @@ const CONSTRAINTTYPES = {
     CS_MSOB: 'Start On or Before',
 }
 
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
 const setDataType = (col, val) => {
     if (!val) {
         return;
@@ -45,6 +47,38 @@ const setDataType = (col, val) => {
         return parseFloat(val);
     }
     return val;
+}
+
+const parseWorkShifts = (data) => {
+    let workHours = Array.from(data.matchAll(/s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g), m => m[0])
+    let shifts = [];
+    workHours.forEach(shift => {
+        let hours = Array.from(shift.matchAll(/[0-1][0-9]:[0-5][0-9]/g), m => m[0]);
+        for (let s = 0; s < hours.length; s += 2) {
+            shifts.push([hours[s], hours[s + 1]]);
+        }
+    })
+    return shifts
+}
+
+const newWorkDay = (dayName, shifts) => {
+    return {
+        day: dayName,
+        shifts: shifts,
+        hours: shifts.reduce((a, s) => {
+            let h = parseInt(s[1].slice(0,2)) - parseInt(s[0].slice(0,2));
+            let m = parseInt(String(s[1]).slice(-2)) / 60 - parseInt(String(s[0]).slice(-2)) / 60
+            return a + h + m;
+        }, 0),
+        start: shifts.length ? shifts[0][0] : "",
+        end: shifts.length ? shifts[shifts.length - 1][1] : ""
+    }
+}
+
+const newExceptionDay = (date, shifts) => {
+    let workDay = newWorkDay(WEEKDAYS[date.getDay()], shifts)
+    workDay.date = date
+    return workDay
 }
 
 const parseWorkWeek = cal => {
@@ -75,34 +109,11 @@ const parseWorkWeek = cal => {
 
     let weekDayData = cal.clndr_data.substring(start, end).slice(1, -1).trim();
     let weekDayDataArr = weekDayData.split(/[1-7]\(\)\(/g).slice(1);
-    let workWeek = {};
-
-    const parseWorkShifts = (workHours) => {
-        let shifts = [];
-        workHours.forEach(shift => {
-            let hours = Array.from(shift.matchAll(/[0-1][0-9]:[0-5][0-9]/g), m => m[0]);
-            for (let s = 0; s < hours.length; s += 2) {
-                shifts.push([hours[s], hours[s + 1]]);
-            }
-        })
-        return shifts
-    }
+    let workWeek = [];
 
     weekDayDataArr.forEach((day, i) => {
-        let workHourStrings = Array.from(day.matchAll(/s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g), m => m[0])
-        let shifts = parseWorkShifts(workHourStrings);
-        let dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i];
-        workWeek[dayName] = {
-            shifts: parseWorkShifts(workHourStrings),
-            hours: shifts.reduce((a, s) => {
-                let h = parseInt(s[1].slice(0,2)) - parseInt(s[0].slice(0,2));
-                let m = parseInt(String(s[1]).slice(-2)) / 60 - parseInt(String(s[0]).slice(-2)) / 60
-                return a + h + m;
-            }, 0),
-            start: shifts.length ? shifts[0][0] : "",
-            end: shifts.length ? shifts[shifts.length - 1][1] : ""
-        };
-        console.log(`${dayName}: ${workWeek[dayName].hours} hours : Start ${workWeek[dayName].start} : Finish ${workWeek[dayName].end}`)
+        workWeek.push(newWorkDay(WEEKDAYS[i], parseWorkShifts(day)));
+        console.log(`${WEEKDAYS[i]}: ${workWeek[i].hours} hours : Start ${workWeek[i].start} : Finish ${workWeek[i].end}`)
     })
     return workWeek;
 }
@@ -114,20 +125,29 @@ function excelDateToJSDate(date) {
 
 const parseHolidays = cal => {
     let data = cal.clndr_data;
+    let holidays = {}
     if (data.includes('d|')) {
         let exceptions = data.split(/\(d\|/g).slice(1)
-        return exceptions.filter(e => !e.includes('s|')).map(e => excelDateToJSDate(e.slice(0, 5)));
+        exceptions.filter(e => !e.includes('s|')).forEach(e => {
+            let dt = excelDateToJSDate(e.slice(0, 5))
+            holidays[dt.getTime()] = dt;
+        })
     }
-    return [];
+    return holidays;
 }
 
 const parseExceptions = cal => {
     let data = cal.clndr_data;
+    let exceptions = {};
     if (data.includes('d|')) {
-        let exceptions = data.split(/\(d\|/g).slice(1)
-        return exceptions.filter(e => e.includes('s|')).map(e => excelDateToJSDate(e.slice(0, 5)));
+        let exceptionStrings = data.split(/\(d\|/g).slice(1);
+        exceptionStrings.filter(e => e.includes('s|')).forEach(e => {
+            let dt = excelDateToJSDate(e.slice(0, 5));
+            exceptions[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(e))
+        })
     }
-    return [];
+    console.log(exceptions)
+    return exceptions;
 }
 
 const newCalendar = cal => {
@@ -136,7 +156,6 @@ const newCalendar = cal => {
     cal.week = parseWorkWeek(cal);
     cal.holidays = parseHolidays(cal);
     cal.exceptions = parseExceptions(cal);
-    console.log(cal.exceptions)
     return cal;
 }
 
