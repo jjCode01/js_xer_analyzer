@@ -31,7 +31,10 @@ const CONSTRAINTTYPES = {
     CS_MSOB: 'Start On or Before',
 }
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+const REGEXSHIFT = /s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g;
+const REGEXHOUR = /[0-1][0-9]:[0-5][0-9]/g;
 
 const setDataType = (col, val) => {
     if (!val) {
@@ -50,10 +53,10 @@ const setDataType = (col, val) => {
 }
 
 const parseWorkShifts = (data) => {
-    let workHours = Array.from(data.matchAll(/s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g), m => m[0])
+    let workHours = Array.from(data.matchAll(REGEXSHIFT), m => m[0])
     let shifts = [];
     workHours.forEach(shift => {
-        let hours = Array.from(shift.matchAll(/[0-1][0-9]:[0-5][0-9]/g), m => m[0]);
+        let hours = Array.from(shift.matchAll(REGEXHOUR), m => m[0]);
         for (let s = 0; s < hours.length; s += 2) {
             shifts.push([hours[s], hours[s + 1]]);
         }
@@ -82,7 +85,8 @@ const newExceptionDay = (date, shifts) => {
 }
 
 const parseWorkWeek = cal => {
-    const start = cal.clndr_data.indexOf("DaysOfWeek()") + 12;
+    const searchFor = "DaysOfWeek()"
+    const start = cal.clndr_data.indexOf(searchFor) + searchFor.length;
     let end = start;
 
     const findEnd = (start, data) => {
@@ -141,7 +145,6 @@ const parseExceptions = cal => {
             exceptions[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(e))
         })
     }
-    console.log(exceptions)
     return exceptions;
 }
 
@@ -321,7 +324,6 @@ const parseFile = (file, name) => {
                 id.unshift(node.wbs_short_name)
             }
             wbs.wbsID = id.join('.')
-            // console.log(wbs.wbsID + ': ', wbs.wbs_name)
         })
     })
 
