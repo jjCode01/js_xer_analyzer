@@ -117,7 +117,7 @@ const parseWorkWeek = cal => {
 
     weekDayDataArr.forEach((day, i) => {
         workWeek.push(newWorkDay(WEEKDAYS[i], parseWorkShifts(day)));
-        console.log(`${WEEKDAYS[i]}: ${workWeek[i].hours} hours : Start ${workWeek[i].start} : Finish ${workWeek[i].end}`)
+        // console.log(`${WEEKDAYS[i]}: ${workWeek[i].hours} hours : Start ${workWeek[i].start} : Finish ${workWeek[i].end}`)
     })
     return workWeek;
 }
@@ -149,7 +149,7 @@ const parseExceptions = cal => {
 }
 
 const newCalendar = cal => {
-    console.log(cal.clndr_name)
+    // console.log(cal.clndr_name)
     cal.default = cal.default_flag === 'Y';
     cal.week = parseWorkWeek(cal);
     cal.holidays = parseHolidays(cal);
@@ -165,6 +165,7 @@ const newProj = proj => {
     proj.resources = [];
     proj.resById = new Map();
     proj.start = proj.last_recalc_date;
+    proj.lateEnd = proj.scd_end_date;
     proj.wbs = new Map()
     return proj;
 }
@@ -273,6 +274,9 @@ const parseFile = (file, name) => {
                         tables.PROJECT[task.proj_id].tasksByCode.set(task.task_code, task); 
                         if (task.start < tables.PROJECT[task.proj_id].start) {
                             tables.PROJECT[task.proj_id].start = task.start;
+                        }
+                        if (!task.completed && task.late_end_date.getTime() > tables.PROJECT[task.proj_id].lateEnd.getTime()) {
+                            tables.PROJECT[task.proj_id].lateEnd = task.late_end_date
                         }
                         break;
                     case 'TASKPRED':

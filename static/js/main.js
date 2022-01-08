@@ -100,6 +100,55 @@ function menuClickHandle(e, id) {
 
 const analyzeProject = proj => {
     const tasks = [...proj.tasks.values()]
+
+    proj.months = {};
+    let endDate = proj.scd_end_date.getTime() > proj.lateEnd.getTime() ? proj.scd_end_date : proj.lateEnd;
+    for (let y = proj.start.getFullYear(); y <= endDate.getFullYear(); y++) {
+        let m = y === proj.start.getFullYear() ? proj.start.getMonth() + 1 : 1;
+        let lastMonth = y === endDate.getFullYear() ? endDate.getMonth() + 1 : 12;
+        for (; m <= lastMonth; m++){
+            console.log(`${y}-${m}`)
+            proj.months[`${y}-${m}`] = {
+                actualActivity: 0.0,
+                earlyActivity: 0.0,
+                lateActivity: 0.0,
+                actualCost: 0.0,
+                earlyCost: 0.0,
+                lateCost: 0.0,
+            }
+        }
+    }
+
+    tasks.forEach(task => {
+        startMonth = `${task.start.getFullYear()}-${task.start.getMonth() + 1}`
+        finishMonth = `${task.finish.getFullYear()}-${task.finish.getMonth() + 1}`
+
+        if (!task.completed) {
+            lateFinishMonth = `${task.late_end_date.getFullYear()}-${task.late_end_date.getMonth() + 1}`
+            proj.months[lateFinishMonth].lateActivity += 0.5;
+        }
+        
+        if (task.notStarted) {
+            proj.months[startMonth].earlyActivity += 0.5;
+            proj.months[finishMonth].earlyActivity += 0.5;
+
+            lateStartMonth = `${task.late_start_date.getFullYear()}-${task.late_start_date.getMonth() + 1}`
+            proj.months[lateStartMonth].lateActivity += 0.5;
+        }
+        if (task.inProgress) {
+            proj.months[startMonth].actualActivity += 0.5;
+            proj.months[finishMonth].earlyActivity += 0.5;
+        }
+        if (task.completed) {
+            proj.months[startMonth].actualActivity += 0.5;
+            proj.months[finishMonth].actualActivity += 0.5;
+        }
+        
+
+        // console.log(proj.months[startMonth].activity)
+
+    })
+
     proj.notStarted = tasks.filter(task => task.notStarted)
     proj.inProgress = tasks.filter(task => task.inProgress)
     proj.completed = tasks.filter(task => task.completed)
@@ -297,8 +346,60 @@ function updateProjCard(name, value){
         document.getElementById("current-ff-per").textContent = formatPercent(projects.current.ffLogic.length / projects.current.rels.length)
         document.getElementById("current-sf-per").textContent = formatPercent(projects.current.sfLogic.length / projects.current.rels.length)
 
+        console.log(Object.keys(projects.current.months))
+        console.log(Object.values(projects.current.months).map(m => m.activities))
 
         //************************************CHART********************************
+        var ctxActivityProgress = document.getElementById('activityProgressChart');
+        var myChart = new Chart(ctxActivityProgress, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(projects.current.months),
+                datasets: [
+                    {
+                        label: 'Actual Progress',
+                        data: Object.values(projects.current.months).map(m => m.actualActivity),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.5)', // blue
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)', // blue
+                        ],
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Planned Early Progress',
+                        data: Object.values(projects.current.months).map(m => m.earlyActivity),
+                        backgroundColor: [
+                            'rgba(113, 194, 92, 0.5)', // green
+                        ],
+                        borderColor: [
+                            'rgba(113, 194, 92, 1)', // green
+                        ],
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Planned Late Progress',
+                        data: Object.values(projects.current.months).map(m => m.lateActivity),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)', // red
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)', // red
+                        ],
+                        borderWidth: 1
+                    },
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
         var ctxActivityStatus = document.getElementById('activityStatusChart');
         var myChart = new Chart(ctxActivityStatus, {
             type: 'doughnut',
