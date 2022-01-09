@@ -118,30 +118,30 @@ const analyzeProject = proj => {
             }
         }
     }
-
+    const percentPerActualDate = (1 / tasks.length) / 2 * 100;
     tasks.forEach(task => {
         startMonth = `${task.start.getFullYear()}-${task.start.getMonth() + 1}`
         finishMonth = `${task.finish.getFullYear()}-${task.finish.getMonth() + 1}`
 
         if (!task.completed) {
             lateFinishMonth = `${task.late_end_date.getFullYear()}-${task.late_end_date.getMonth() + 1}`
-            proj.months[lateFinishMonth].lateActivity += 0.5;
+            proj.months[lateFinishMonth].lateActivity += percentPerActualDate;
         }
         
         if (task.notStarted) {
-            proj.months[startMonth].earlyActivity += 0.5;
-            proj.months[finishMonth].earlyActivity += 0.5;
+            proj.months[startMonth].earlyActivity += percentPerActualDate;
+            proj.months[finishMonth].earlyActivity += percentPerActualDate;
 
             lateStartMonth = `${task.late_start_date.getFullYear()}-${task.late_start_date.getMonth() + 1}`
-            proj.months[lateStartMonth].lateActivity += 0.5;
+            proj.months[lateStartMonth].lateActivity += percentPerActualDate;
         }
         if (task.inProgress) {
-            proj.months[startMonth].actualActivity += 0.5;
-            proj.months[finishMonth].earlyActivity += 0.5;
+            proj.months[startMonth].actualActivity += percentPerActualDate;
+            proj.months[finishMonth].earlyActivity += percentPerActualDate;
         }
         if (task.completed) {
-            proj.months[startMonth].actualActivity += 0.5;
-            proj.months[finishMonth].actualActivity += 0.5;
+            proj.months[startMonth].actualActivity += percentPerActualDate;
+            proj.months[finishMonth].actualActivity += percentPerActualDate;
         }
         
 
@@ -396,7 +396,8 @@ function updateProjCard(name, value){
                     y: {
                         beginAtZero: true
                     }
-                }
+                },
+                maintainAspectRatio: false
             }
         });
 
