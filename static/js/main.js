@@ -360,7 +360,8 @@ function updateProjCard(name, value){
                         borderColor: [
                             'rgba(54, 162, 235, 1)', // blue
                         ],
-                        borderWidth: 1
+                        borderWidth: 1,
+                        stack: 'Stack 0',
                     },
                     {
                         label: 'Planned Early Progress',
@@ -371,7 +372,8 @@ function updateProjCard(name, value){
                         borderColor: [
                             'rgba(113, 194, 92, 1)', // green
                         ],
-                        borderWidth: 1
+                        borderWidth: 1,
+                        stack: 'Stack 0',
                     },
                     {
                         label: 'Planned Late Progress',
@@ -382,7 +384,8 @@ function updateProjCard(name, value){
                         borderColor: [
                             'rgba(255, 99, 132, 1)', // red
                         ],
-                        borderWidth: 1
+                        borderWidth: 1,
+                        stack: 'Stack 1',
                     },
                 ]
             },
