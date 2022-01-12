@@ -317,6 +317,7 @@ const parseFile = (file, name) => {
     })
 
     Object.values(tables.PROJECT).forEach(proj => {
+        // console.log(proj.start)
         proj.wbs.forEach(wbs => {
             let id = [wbs.wbs_short_name];
             let node = wbs;

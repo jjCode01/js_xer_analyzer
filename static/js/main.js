@@ -99,16 +99,17 @@ function menuClickHandle(e, id) {
 }
 
 const analyzeProject = proj => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
     const tasks = [...proj.tasks.values()]
 
     proj.months = {};
     let endDate = proj.scd_end_date.getTime() > proj.lateEnd.getTime() ? proj.scd_end_date : proj.lateEnd;
     for (let y = proj.start.getFullYear(); y <= endDate.getFullYear(); y++) {
-        let m = y === proj.start.getFullYear() ? proj.start.getMonth() + 1 : 1;
-        let lastMonth = y === endDate.getFullYear() ? endDate.getMonth() + 1 : 12;
+        let m = y === proj.start.getFullYear() ? proj.start.getMonth() : 0;
+        let lastMonth = y === endDate.getFullYear() ? endDate.getMonth() : 11;
         for (; m <= lastMonth; m++){
-            console.log(`${y}-${m}`)
-            proj.months[`${y}-${m}`] = {
+            proj.months[`${monthNames[m]}-${y}`] = {
                 actualActivity: 0.0,
                 earlyActivity: 0.0,
                 lateActivity: 0.0,
@@ -120,11 +121,11 @@ const analyzeProject = proj => {
     }
     const percentPerActualDate = (1 / tasks.length) / 2 * 100;
     tasks.forEach(task => {
-        startMonth = `${task.start.getFullYear()}-${task.start.getMonth() + 1}`
-        finishMonth = `${task.finish.getFullYear()}-${task.finish.getMonth() + 1}`
+        let startMonth = `${monthNames[task.start.getMonth()]}-${task.start.getFullYear()}`
+        let finishMonth = `${monthNames[task.finish.getMonth()]}-${task.finish.getFullYear()}`
 
         if (!task.completed) {
-            lateFinishMonth = `${task.late_end_date.getFullYear()}-${task.late_end_date.getMonth() + 1}`
+            lateFinishMonth = `${monthNames[task.late_end_date.getMonth()]}-${task.late_end_date.getFullYear()}`
             proj.months[lateFinishMonth].lateActivity += percentPerActualDate;
         }
         
@@ -132,7 +133,7 @@ const analyzeProject = proj => {
             proj.months[startMonth].earlyActivity += percentPerActualDate;
             proj.months[finishMonth].earlyActivity += percentPerActualDate;
 
-            lateStartMonth = `${task.late_start_date.getFullYear()}-${task.late_start_date.getMonth() + 1}`
+            lateStartMonth = `${monthNames[task.late_start_date.getMonth()]}-${task.late_start_date.getFullYear()}`
             proj.months[lateStartMonth].lateActivity += percentPerActualDate;
         }
         if (task.inProgress) {
@@ -143,10 +144,6 @@ const analyzeProject = proj => {
             proj.months[startMonth].actualActivity += percentPerActualDate;
             proj.months[finishMonth].actualActivity += percentPerActualDate;
         }
-        
-
-        // console.log(proj.months[startMonth].activity)
-
     })
 
     proj.notStarted = tasks.filter(task => task.notStarted)
@@ -346,8 +343,6 @@ function updateProjCard(name, value){
         document.getElementById("current-ff-per").textContent = formatPercent(projects.current.ffLogic.length / projects.current.rels.length)
         document.getElementById("current-sf-per").textContent = formatPercent(projects.current.sfLogic.length / projects.current.rels.length)
 
-        console.log(Object.keys(projects.current.months))
-        console.log(Object.values(projects.current.months).map(m => m.activities))
 
         //************************************CHART********************************
         var ctxActivityProgress = document.getElementById('activityProgressChart');
