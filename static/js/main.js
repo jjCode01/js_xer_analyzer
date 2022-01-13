@@ -318,6 +318,20 @@ function updateProjCard(name, value){
         const currResources = projects.current.resources
         // const currLogic = new Map(projects.current.rels.map(r => [setRelKey(projects.current.tasks, r), r]))
 
+        const calTable = document.getElementById('calendar-tbl');
+        Object.values(tables.current.CALENDAR).forEach(cal => {
+            let row = calTable.insertRow(), cell;
+            cell = document.createElement("td");
+            cell.innerText = cal.clndr_name;
+            row.append(cell);
+            cal.week.forEach(day => {
+                cell = document.createElement("td");
+                cell.innerText = day.hours;
+                cell.style.textAlign = 'center'
+                row.append(cell);
+            })
+        })
+
         document.getElementById('title').innerText = `XER Analyzer - ${projects.current.proj_short_name}`
 
         document.getElementById("sched-progress").style.width = `${formatPercent(projects.current.schedPercentComp)}`
